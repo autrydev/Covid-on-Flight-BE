@@ -42,7 +42,7 @@ class COFUserManager(BaseUserManager):
 # Defines the COFUser object model
 class COFUser(AbstractUser):
     username = None
-    email = models.EmailField(unique=True)
+    email = models.EmailField(unique=True, primary_key=True)
     first_name = models.CharField(max_length=50)
     last_name = models.CharField(max_length=50)
     phone_number = models.CharField(max_length=15)
@@ -72,6 +72,7 @@ class RecoveryCombination(models.Model):
 # Defines the Survey object model
 class Survey(models.Model):
     # IDs already automatically created by Django
+    survey_id = models.AutoField(primary_key=True)
     results = models.CharField(max_length=8, blank=True)
     covid_test = models.BooleanField() # Yes, No
     test_results = models.CharField(max_length=3, default='N/A') # Yes, No, N/A
@@ -90,7 +91,7 @@ class Survey(models.Model):
 
 # Defines the Flight object model
 class Flight(models.Model):
-    flight_id = models.CharField(max_length=20) # TODO: Possibly change length
+    flight_id = models.CharField(max_length=20, primary_key=True) # TODO: Possibly change length
     departure_city = models.CharField(max_length=35)
     arrival_city = models.CharField(max_length=35)
     date = models.DateField()
@@ -106,11 +107,11 @@ class FlightsTaken(models.Model):
         on_delete=models.CASCADE
     )
     survey_id = models.ForeignKey(
-        'Survey',
+        Survey,
         on_delete=models.CASCADE
     )
     flight_id = models.ForeignKey(
-        'Flight',
+        Flight,
         on_delete=models.CASCADE
     )
     row_seat = models.CharField(max_length=8)
