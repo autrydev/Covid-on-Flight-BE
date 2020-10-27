@@ -47,6 +47,9 @@ class COFUserUpdateForm(forms.ModelForm):
         model = COFUser
         fields = ('email', 'password', 'first_name', 'last_name', 'phone_number', 'covid_status', 'last_update', 'is_staff')
 
+    def clean_password(self):
+        return self.initial['password']
+
 
 class COFUserAdmin(UserAdmin):
     # Sets the forms to be utilized by admin site to those created above
