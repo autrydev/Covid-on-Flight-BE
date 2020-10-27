@@ -5,6 +5,7 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.forms import User
 
 def home(request):
+	#Reserved for homepage..currently redirects
 	if request.user.is_authenticated:
 		return redirect('user_dashboard')
 	else:
@@ -15,6 +16,7 @@ def login(request):
 		return redirect('user_dashboard')
 	
 	if request.method == "POST":
+	#Uses Django Authentication
 		email = request.POST['email']
 		password = request.POST['password']
 		user = authenticate(username=email, password=password)
@@ -45,11 +47,12 @@ def signup(request):
 		if checkuser is not None:
 			return HttpResponse('Username Already Exists')
 		else:
+			#Create COFUser & Django User
 			user_mgr = COFUserManager()
 			user_mgr.create_user(email, password, first_name, last_name, phone_number)
 			py_user = User.objects.create_user(username=email, email=email, first_name=first_name, last_name=last_name)
 			py_user.save()
-			return py_user
+			return py_user #or COFUser..?
 
 def user_dashboard(request):
 	return HttpResponse('User_Dashboard Vue ✈️')
