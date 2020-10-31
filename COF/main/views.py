@@ -21,10 +21,10 @@ def login(request):
 		password = request.POST['password']
 		user = authenticate(username=email, password=password)
 		if user is not None:
-			django_login(request,user)
+			#django_login(request,user)
 			return redirect('user_dashboard')
 		else:
-			return HttpResponse('Invalid Username/Password')
+			return HttpResponse('Invalid Email/Password', status=401)
 
 def logout(request):
 	if request.user.is_authenticated:
