@@ -156,5 +156,83 @@ class Command(BaseCommand):
             print('Jake Matthew\'s Recovery Combination', end=' ')
             self.stdout.write(self.style.SUCCESS('added!'))
 
+            # Surveys
+            self.stdout.write('============Surveys============')
+            alligator_survey = Survey.objects.create(
+                results = 'Incomplete',
+                covid_test = False,
+                test_results = 'N/A',
+                fever_chills = False,
+                cough = True,
+                breathing_issues = False,
+                aches = False,
+                headache = False,
+                loss_taste_smell = False,
+                sore_throat = True,
+                congestion = False,
+                nausea = False,
+                diarrhea = False
+            )
+            alligator_survey.save()
+            print('Alli Gator\'s Survey 1', end=' ')
+            self.stdout.write(self.style.SUCCESS('added!'))
+
+            brady_survey = Survey.objects.create(
+                results = 'Negative',
+                covid_test = True,
+                test_results = 'N',
+                fever_chills = False,
+                cough = False,
+                breathing_issues = False,
+                aches = False,
+                headache = False,
+                loss_taste_smell = False,
+                sore_throat = False,
+                congestion = False,
+                nausea = False,
+                diarrhea = False
+            )
+            brady_survey.save()
+            print('Tom Brady\'s Survey 1', end=' ')
+            self.stdout.write(self.style.SUCCESS('added!'))
+
+            bastian_survey = Survey.objects.create(
+                results = 'Negative',
+                covid_test = True,
+                test_results = 'N',
+                fever_chills = False,
+                cough = False,
+                breathing_issues = False,
+                aches = False,
+                headache = False,
+                loss_taste_smell = False,
+                sore_throat = False,
+                congestion = False,
+                nausea = False,
+                diarrhea = False
+            )
+            bastian_survey.save()
+            print('Edward Bastian\'s Survey 1', end=' ')
+            self.stdout.write(self.style.SUCCESS('added!'))
+
+            matthews_survey = Survey.objects.create(
+                results = 'Positive',
+                covid_test = False,
+                test_results = 'N/A',
+                fever_chills = True,
+                cough = True,
+                breathing_issues = True,
+                aches = False,
+                headache = False,
+                loss_taste_smell = False,
+                sore_throat = False,
+                congestion = False,
+                nausea = False,
+                diarrhea = False
+            )
+            matthews_survey.save()
+            print('Jake Matthews\' Survey 1', end=' ')
+            self.stdout.write(self.style.SUCCESS('added!'))
+
         except IntegrityError:
             raise CommandError('Uniqueness IntegrityError. Please delete db.sqlite3 before running this command.')
