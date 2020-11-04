@@ -146,5 +146,15 @@ class Command(BaseCommand):
             print('DTW -> PHX', dtw_phx.date, '17:00:00', end=' ')
             self.stdout.write(self.style.SUCCESS('added!'))
 
+            # Recovery Combinations
+            self.stdout.write('============Recovery Combinations============')
+            matthews_code = RecoveryCombination.objects.create(
+                email = matthews,
+                recovery_code = 'DfXeNaPQ'
+            )
+            matthews_code.save()
+            print('Jake Matthew\'s Recovery Combination', end=' ')
+            self.stdout.write(self.style.SUCCESS('added!'))
+
         except IntegrityError:
             raise CommandError('Uniqueness IntegrityError. Please delete db.sqlite3 before running this command.')
