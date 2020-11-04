@@ -59,7 +59,7 @@ def user_dashboard(request):
 
 def admin_dashboard(request):
 	return HttpResponse('Admin_Dashboard Vue ✈️')
-=======
+
 from django.shortcuts import render
 from django.http import HttpResponse
 
