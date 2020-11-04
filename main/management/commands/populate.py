@@ -195,6 +195,24 @@ class Command(BaseCommand):
             brady_survey.save()
             print('Tom Brady\'s Survey 1', end=' ')
             self.stdout.write(self.style.SUCCESS('added!'))
+            brady_survey2 = Survey.objects.create(
+                results = 'Negative',
+                covid_test = True,
+                test_results = 'N',
+                fever_chills = False,
+                cough = False,
+                breathing_issues = False,
+                aches = False,
+                headache = False,
+                loss_taste_smell = False,
+                sore_throat = False,
+                congestion = False,
+                nausea = False,
+                diarrhea = False
+            )
+            brady_survey2.save()
+            print('Tom Brady\'s Survey 2', end=' ')
+            self.stdout.write(self.style.SUCCESS('added!'))
 
             bastian_survey = Survey.objects.create(
                 results = 'Negative',
@@ -232,6 +250,57 @@ class Command(BaseCommand):
             )
             matthews_survey.save()
             print('Jake Matthews\' Survey 1', end=' ')
+            self.stdout.write(self.style.SUCCESS('added!'))
+
+            # Flights Taken
+            self.stdout.write('============Flights Taken============')
+            alligator_flight = FlightsTaken.objects.create(
+                email = alligator,
+                survey_id = alligator_survey,
+                flight_id = avl_pie,
+                row_seat = '16D'
+            )
+            alligator_flight.save()
+            print('Alli Gator\'s Flight 1', end=' ')
+            self.stdout.write(self.style.SUCCESS('added!'))
+
+            brady_flight = FlightsTaken.objects.create(
+                email = brady,
+                survey_id = brady_survey,
+                flight_id = avl_pie,
+                row_seat = '3A'
+            )
+            brady_flight.save()
+            print('Tom Brady\'s Flight 1', end=' ')
+            self.stdout.write(self.style.SUCCESS('added!'))
+            brady_flight2 = FlightsTaken.objects.create(
+                email = brady,
+                survey_id = brady_survey2,
+                flight_id = pie_avl,
+                row_seat = '5A'
+            )
+            brady_flight2.save()
+            print('Tom Brady\'s Flight 2', end=' ')
+            self.stdout.write(self.style.SUCCESS('added!'))
+
+            bastian_flight = FlightsTaken.objects.create(
+                email = bastian,
+                survey_id = bastian_survey,
+                flight_id = lax_jfk,
+                row_seat = '2D'
+            )
+            bastian_flight.save()
+            print('Edward Bastian\'s Flight 1', end=' ')
+            self.stdout.write(self.style.SUCCESS('added!'))
+
+            matthews_flight = FlightsTaken.objects.create(
+                email = matthews,
+                survey_id = matthews_survey,
+                flight_id = lax_jfk,
+                row_seat = '14A'
+            )
+            matthews_flight.save()
+            print('Jake Matthew\'s Flight 1', end=' ')
             self.stdout.write(self.style.SUCCESS('added!'))
 
         except IntegrityError:
