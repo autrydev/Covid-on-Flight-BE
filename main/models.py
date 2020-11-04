@@ -1,8 +1,8 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
-# Creates customer Manager for COFUser object because the regular User object is being extended
-class COFUserManager(BaseUserManager):
+# Creates customer Manager for cofUser object because the regular User object is being extended
+class cofUserManager(BaseUserManager):
     # Creates a regular User and saves into the database
     def create_user(self, email, password, first_name, last_name, phone_number, covid_status='Unknown', last_update=None):
         user = self.model(
@@ -39,8 +39,8 @@ class COFUserManager(BaseUserManager):
         return user
 
 
-# Defines the COFUser object model
-class COFUser(AbstractUser):
+# Defines the cofUser object model
+class cofUser(AbstractUser):
     username = None
     email = models.EmailField(unique=True, primary_key=True)
     first_name = models.CharField(max_length=50)
@@ -52,7 +52,7 @@ class COFUser(AbstractUser):
     )
     last_update = models.DateField(null=True, blank=True)
 
-    objects = COFUserManager()
+    objects = cofUserManager()
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['first_name', 'last_name', 'phone_number']
 
@@ -63,7 +63,7 @@ class COFUser(AbstractUser):
 # Defines the RecoveryCombination object model
 class RecoveryCombination(models.Model):
     email = models.ForeignKey(
-        'COFUser',
+        'cofUser',
         on_delete=models.CASCADE
     )
     recovery_code = models.CharField(max_length=12) # TODO: Hash recovery codes
@@ -103,7 +103,7 @@ class Flight(models.Model):
 # Defines the FlightsTaken object model
 class FlightsTaken(models.Model):
     email = models.ForeignKey(
-        'COFUser',
+        'cofUser',
         on_delete=models.CASCADE
     )
     survey_id = models.ForeignKey(
