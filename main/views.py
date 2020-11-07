@@ -4,6 +4,8 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.forms import User
 
+import json
+
 def home(request):
 	#Reserved for homepage..currently redirects
 	if request.user.is_authenticated:
@@ -17,14 +19,24 @@ def login(request):
 	
 	if request.method == "POST":
 	#Uses Django Authentication
-		email = request.POST['email']
-		password = request.POST['password']
+
+		#These don't work:
+		#email = request.POST['email']
+		#password = request.POST['password']
+		#email = request.POST.get('email')
+		#password = request.POST.get('password')
+
+
+		json_data = json.loads(request.body) #Put all contents of Post data into json_data variable
+		email = json_data['email'] #Reference the email key/value from the json_data variable
+		password = json_data['password']
 		user = authenticate(username=email, password=password)
 		if user is not None:
 			#django_login(request,user)
-			return redirect('user_dashboard')
+			#return redirect('user_dashboard')
+			return HttpResponse(request.user.id, status=200)
 		else:
-			return HttpResponse('Invalid Email/Password', status=401)
+			return HttpResponse('Invalid Email/Password', status=200)
 
 def logout(request):
 	if request.user.is_authenticated:
@@ -63,5 +75,5 @@ def admin_dashboard(request):
 from django.shortcuts import render
 from django.http import HttpResponse
 
-def login(request):
-    return HttpResponse('Hi! This is Covid on Flight speaking. ✈️')
+#def login(request):
+    #return HttpResponse('Hi! This is Covid on Flight speaking. ✈️')
