@@ -126,7 +126,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
-AUTH_USER_MODEL = 'main.cofUser'
+AUTH_USER_MODEL = 'main.COFUser'
 
 django_heroku.settings(locals())
 
