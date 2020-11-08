@@ -1,11 +1,11 @@
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin
-from .models import cofUser, RecoveryCombination, FlightsTaken, Flight, Survey
+from .models import COFUser, RecoveryCombination, FlightsTaken, Flight, Survey
 from django import forms
 from django.contrib.auth.forms import ReadOnlyPasswordHashField
 
 # User Creation Form for Django's Admin Site
-class cofUserCreationForm(forms.ModelForm):
+class COFUserCreationForm(forms.ModelForm):
     # Gathers password and password confirmation from form
     password = forms.CharField(label='Password', widget=forms.PasswordInput)
     confirm_password = forms.CharField(label='Confirm Password' , widget=forms.PasswordInput)
@@ -30,37 +30,37 @@ class cofUserCreationForm(forms.ModelForm):
 
         return user
 
-    # cofUser object's attributes
+    # COFUser object's attributes
     class Meta:
-        model = cofUser
+        model = COFUser
         fields = ('email', 'password', 'first_name', 'last_name', 'phone_number', 'covid_status', 'last_update', 'is_staff')
 
 
  # User Update Form for Django's Admin Site   
-class cofUserUpdateForm(forms.ModelForm):
+class COFUserUpdateForm(forms.ModelForm):
     # Not allowing password changing from admin portal
     # "python3 manage.py changepassword email" works if necessary
     password = ReadOnlyPasswordHashField()
 
-    # cofUser object's attributes
+    # COFUser object's attributes
     class Meta:
-        model = cofUser
+        model = COFUser
         fields = ('email', 'password', 'first_name', 'last_name', 'phone_number', 'covid_status', 'last_update', 'is_staff')
 
 
-class cofUserAdmin(UserAdmin):
+class COFUserAdmin(UserAdmin):
     # Sets the forms to be utilized by admin site to those created above
-    form = cofUserUpdateForm
-    add_form = cofUserCreationForm
+    form = COFUserUpdateForm
+    add_form = COFUserCreationForm
 
-    # The list of cofUser objects will contain the fields below
+    # The list of COFUser objects will contain the fields below
     list_display = ('email', 'first_name', 'last_name', 'phone_number', 'covid_status', 'last_update', 'is_staff')
     fieldsets = (
         (None, {'fields' : ('email', 'password', 'first_name', 'last_name', 'phone_number', 'covid_status', 'last_update')}),
         ('Permissions', {'fields' : ('is_staff',)})
     )
 
-    # Specifies fields used when creating a cofUser object
+    # Specifies fields used when creating a COFUser object
     add_fieldsets = (
         (None, {
             'classes' : ('wide',),
@@ -74,7 +74,7 @@ class cofUserAdmin(UserAdmin):
 
 
 # Registers models to Django's Admin Site
-admin.site.register(cofUser, cofUserAdmin)
+admin.site.register(COFUser, COFUserAdmin)
 admin.site.register(RecoveryCombination)
 admin.site.register(FlightsTaken)
 admin.site.register(Flight)

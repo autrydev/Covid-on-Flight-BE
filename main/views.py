@@ -59,7 +59,7 @@ def signup(request):
 		if checkuser is not None:
 			return HttpResponse('Username Already Exists')
 		else:
-			#Create cofUser & Django User
+			#Create COFUser & Django User
 			user_mgr = cofUserManager()
 			user_mgr.create_user(email, password, first_name, last_name, phone_number)
 			py_user = User.objects.create_user(username=email, email=email, first_name=first_name, last_name=last_name)
