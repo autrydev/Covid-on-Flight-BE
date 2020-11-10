@@ -3,6 +3,8 @@ from django.http import HttpResponse
 from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.forms import User
+from django.contrib.auth import get_user_model
+from .models import COFUser
 
 import json
 
@@ -55,18 +57,21 @@ def signup(request):
 		first_name = json_data['first_name']
 		last_name = json_data['last_name']
 		phone_number = json_data['phone_number']
-		checkuser = authenticate(username=email)
+		checkuser = COFUser.objects.filter(email=email)
 
-		if checkuser is not None:
-			return HttpResponse('Username Already Exists')
+		if checkuser:
+			return HttpResponse('Username Already Exists', status=401)
 		else:
 			#Create cofUser & Django User
-			user_mgr = cofUserManager()
-			user_mgr.create_user(email, password, first_name, last_name, phone_number)
-			py_user = User.objects.create_user(username=email, email=email, first_name=first_name, last_name=last_name)
-				phone_number=phone_number,
+			py_user = get_user_model().objects.create_user(
+				email=email,
+				password=password,
+				first_name=first_name,
+				last_name=last_name,
+				phone_number=phone_number
+			)
 			py_user.save()
-			return py_user
+			return HttpResponse(py_user.id, status=200)
 
 def user_dashboard(request):
 	return HttpResponse('User_Dashboard Vue ✈️')
