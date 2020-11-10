@@ -34,9 +34,9 @@ def login(request):
 		if user is not None:
 			#django_login(request,user)
 			#return redirect('user_dashboard')
-			return HttpResponse(request.user.id, status=200)
+			return HttpResponse(user.id, status=200)
 		else:
-			return HttpResponse('Invalid Email/Password', status=200)
+			return HttpResponse('Invalid Email/Password', status=401)
 
 def logout(request):
 	if request.user.is_authenticated:
@@ -49,11 +49,12 @@ def signup(request):
 		return redirect('user_dashboard')
 	
 	if request.method == "POST":
-		email = request.POST['email']
-		password = request.POST['password']
-		first_name = request.POST['first_name']
-		last_name = request.POST['last_name']
-		phone_number = request.POST['phone_number']
+		json_data = json.loads(request.body) #Put all contents of Post data into json_data variable
+		email = json_data['email'] #Reference the email key/value from the json_data variable
+		password = json_data['password']
+		first_name = json_data['first_name']
+		last_name = json_data['last_name']
+		phone_number = json_data['phone_number']
 		checkuser = authenticate(username=email)
 
 		if checkuser is not None:
@@ -63,8 +64,9 @@ def signup(request):
 			user_mgr = cofUserManager()
 			user_mgr.create_user(email, password, first_name, last_name, phone_number)
 			py_user = User.objects.create_user(username=email, email=email, first_name=first_name, last_name=last_name)
+				phone_number=phone_number,
 			py_user.save()
-			return py_user #or cofUser..?
+			return py_user
 
 def user_dashboard(request):
 	return HttpResponse('User_Dashboard Vue ✈️')
