@@ -10,6 +10,7 @@ from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
+from django.http import JsonResponse
 
 twilio_client = Client('ACe4f586ddf64043984c3f813e1bf1232e', 'a12087fa31758795d95c38d240b87177') # Twilio
 sendgrid_client = SendGridAPIClient('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') # SendGrid
@@ -109,3 +110,18 @@ def user_dashboard(request):
 
 def admin_dashboard(request):
 	return HttpResponse('Admin_Dashboard Vue ✈️')
+
+def account_settings(request):
+	json_data = json.loads(request.body)
+	id = json_data['id']
+
+	user = COFUser.objects.get(id=id)
+
+	user_data = {
+		'firstName' : user.first_name,
+		'lastName' : user.last_name,
+		'email' : user.email,
+		'phoneNumber' : user.phone_number
+	}
+
+	return JsonResponse(user_data)
