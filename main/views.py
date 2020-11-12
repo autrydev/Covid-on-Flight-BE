@@ -8,8 +8,11 @@ from .models import COFUser
 import json
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
+from sendgrid import SendGridAPIClient
+from sendgrid.helpers.mail import Mail
 
-client = Client('ACe4f586ddf64043984c3f813e1bf1232e', 'a12087fa31758795d95c38d240b87177') # Twilio
+twilio_client = Client('ACe4f586ddf64043984c3f813e1bf1232e', 'a12087fa31758795d95c38d240b87177') # Twilio
+sendgrid_client = SendGridAPIClient('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') # SendGrid
 
 def home(request):
 	#Reserved for homepage..currently redirects
@@ -75,14 +78,29 @@ def signup(request):
 			)
 			py_user.save()
 
+
+			# Sends SMS (Twilio)
 			try:
-				client.messages.create(
+				twilio_client.messages.create(
 					body=('Thank you for signing up for Covid on Flight, ' + first_name + ' ' + last_name + '!'),
 					from_='+12185304600',
 					to=('+1'+phone_number)
 				)
 			except TwilioRestException:
 				print('Error texting user')
+
+			# Sends email (SendGrid)
+			try:
+				email = Mail(
+					from_email='CovidOnFlight@gmail.com',
+					to_emails=email,
+					subject='Welcome to Covid on Flight!',
+					html_content=('<h2><strong>Hi, ' + first_name + ' ' + last_name + '! ✈️</strong></h2><p>Welcome to Covid on Flight! We look forward to making your travels safer.</p>')
+				)
+
+				sendgrid_client.send(email)
+			except Exception as e:
+				print(e)
 
 			return HttpResponse(py_user.id, status=200)
 
