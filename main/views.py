@@ -5,8 +5,11 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.forms import User
 from django.contrib.auth import get_user_model
 from .models import COFUser
-
 import json
+from twilio.rest import Client
+from twilio.base.exceptions import TwilioRestException
+
+client = Client('ACe4f586ddf64043984c3f813e1bf1232e', 'a12087fa31758795d95c38d240b87177') # Twilio
 
 def home(request):
 	#Reserved for homepage..currently redirects
@@ -71,6 +74,16 @@ def signup(request):
 				phone_number=phone_number
 			)
 			py_user.save()
+
+			try:
+				client.messages.create(
+					body=('Thank you for signing up for Covid on Flight, ' + first_name + ' ' + last_name + '!'),
+					from_='+12185304600',
+					to=('+1'+phone_number)
+				)
+			except TwilioRestException:
+				print('Error texting user')
+
 			return HttpResponse(py_user.id, status=200)
 
 def user_dashboard(request):
@@ -78,9 +91,3 @@ def user_dashboard(request):
 
 def admin_dashboard(request):
 	return HttpResponse('Admin_Dashboard Vue ✈️')
-
-from django.shortcuts import render
-from django.http import HttpResponse
-
-#def login(request):
-    #return HttpResponse('Hi! This is Covid on Flight speaking. ✈️')
