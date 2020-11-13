@@ -297,5 +297,5 @@ class Command(BaseCommand):
             print('Jake Matthew\'s Flight 1', end=' ')
             self.stdout.write(self.style.SUCCESS('added!'))
 
-        except IntegrityError:
-            raise CommandError('Uniqueness IntegrityError. Please delete db.sqlite3 before running this command.')
+        except IntegrityError as e:
+            raise CommandError(e.message)
