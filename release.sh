@@ -8,4 +8,4 @@ python manage.py makemigrations main
 python manage.py migrate main
 python manage.py makemigrations
 python manage.py migrate
-python manage.py createsuperuser
+python manage.py populate
