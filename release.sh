@@ -1,17 +1,17 @@
 #!/bin/bash
 
 ls
-echo ("------------")
+echo "------------"
 cd ./main
 ls
-echo ("------------")
+echo "------------"
 rm -r migrations
 cd ..
-echo ("------------")
+echo "------------"
 cd ./cof
 ls
-echo ("------------")
+echo "------------"
 rm db.sqlite3
 ls
-echo ("------------")
+echo "------------"
 python manage.py testdata
