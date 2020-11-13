@@ -156,6 +156,7 @@ def account_settings(request):
         user.last_name = last_name;
         user.email = email;
         user.phone_number = phone_number;
+        user.save();
         
 		#checkuser = COFUser.objects.filter(email=email)
         
