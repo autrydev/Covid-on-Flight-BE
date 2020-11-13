@@ -106,17 +106,59 @@ def signup(request):
 			return HttpResponse(py_user.id, status=200)
 
 def user_dashboard(request):
-	return HttpResponse('User_Dashboard Vue ✈️')
+    # tuple = [flight#, departure_city, arrival_city, date_registered]
+	#return array of arrays
+    return HttpResponse('User_Dashboard Vue ✈️')
+	mail = COFUser.objects.get(pk=request.user.id)
+	flights = FlightsTaken.objects.filter(email=mail)
+	dat = []
+	for flight in flights:
+		tupl = [flight.flight_id, flight.departure_city, flight.arrival_city. flight.date]
+		dat.append(tupl)
+
+	data = {
+        'flights': data
+    }
+	
+	return JsonResponse(data, safe=False);
+	
 
 def admin_dashboard(request):
 	return HttpResponse('Admin_Dashboard Vue ✈️')
+    
+def MyCOVIDStatus(request):
+    json_data = json.loads(request.body)
+	id = json_data['id']
+	user = COFUser.objects.get(id=id)
+    
+    data = {
+        'status' : user.covid_status,
+		'last_update' : user.last_update,
+		'last_flight' : 'None',
+    }
+    
+    return JsonResponse(data, safe=False);
 
 def account_settings(request):
 	json_data = json.loads(request.body)
 	id = json_data['id']
 
 	user = COFUser.objects.get(id=id)
-
+    
+    if request.method == "POST":
+		json_data = json.loads(request.body) 
+		first_name = json_data['firstName']
+		last_name = json_data['lastName']
+        email = json_data['email']
+		phone_number = json_data['phoneNumber']
+        
+        user.first_name = first_name;
+        user.last_name = last_name;
+        user.email = email;
+        user.phone_number = phone_number;
+        
+		#checkuser = COFUser.objects.filter(email=email)
+        
 	user_data = {
 		'firstName' : user.first_name,
 		'lastName' : user.last_name,
