@@ -1,4 +1,6 @@
 #!/bin/bash
 
-rm -r /main/migrations
+ls
+rm -r main/migrations
+ls
 python manage.py populate
