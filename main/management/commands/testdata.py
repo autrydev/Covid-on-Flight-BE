@@ -9,7 +9,6 @@ class Command(BaseCommand):
     help = 'Fills database with test data'
 
     def handle(self, *args, **options):
-        try:
             # Add users
             self.stdout.write('============Users============')
             admin = get_user_model().objects.create_user(
@@ -296,6 +295,3 @@ class Command(BaseCommand):
             matthews_flight.save()
             print('Jake Matthew\'s Flight 1', end=' ')
             self.stdout.write(self.style.SUCCESS('added!'))
-
-        except IntegrityError as e:
-            raise CommandError(e.message)
