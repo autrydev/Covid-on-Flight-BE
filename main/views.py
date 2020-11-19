@@ -111,6 +111,9 @@ def user_dashboard(request):
 def admin_dashboard(request):
 	return HttpResponse('Admin_Dashboard Vue ✈️')
 
+def admin_flight_search(request):
+	return HttpResponse('Admin_Dashboard Flight_Search ✈️')
+
 def account_settings(request):
 	json_data = json.loads(request.body)
 	id = json_data['id']
