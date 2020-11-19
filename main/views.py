@@ -113,14 +113,28 @@ def admin_dashboard(request):
 
 def admin_flight_search(request):
 	json_data = json.loads(request.body)
-	from_date = json_data['from_date']
-	to_date = json_data['to_date']
+	keys = json_data.keys()
+	flights = Flight.objects.all()
 
-	from_date = from_date[6:10] + '-' + from_date[0:2] + '-' + from_date[3:5]
-	to_date = to_date[6:10] + '-' + to_date[0:2] + '-' + to_date[3:5]
+	if 'from_date' in keys:
+		from_date = json_data['from_date']
+		from_date = from_date[6:10] + '-' + from_date[0:2] + '-' + from_date[3:5]
+		flights = flights.filter(date__gte=from_date)
 
-	flights = Flight.objects.filter(date__lte=to_date).filter(date__gte=from_date)
+	if 'to_date' in keys:
+		to_date = json_data['to_date']
+		to_date = to_date[6:10] + '-' + to_date[0:2] + '-' + to_date[3:5]
+		flights = flights.filter(date__lte=to_date)
+	
+	if 'departure_city' in keys:
+		flights = flights.filter(departure_city=json_data['departure_city'])
+	
+	if 'arrival_city' in keys:
+		flights = flights.filter(arrival_city=json_data['arrival_city'])
 
+	if 'flight_id' in keys:
+		flights = flights.filter(flight_id=json_data['flight_id'])
+	
 	if flights is None:
 		count = 0
 	else:
