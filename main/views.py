@@ -116,6 +116,9 @@ def admin_flight_search(request):
 	from_date = json_data['from_date']
 	to_date = json_data['to_date']
 
+	from_date = from_date[6:10] + '-' + from_date[0:2] + '-' + from_date[3:5]
+	to_date = to_date[6:10] + '-' + to_date[0:2] + '-' + to_date[3:5]
+
 	flights = Flight.objects.filter(date__lte=to_date).filter(date__gte=from_date)
 
 	if flights is None:
