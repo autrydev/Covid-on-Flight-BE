@@ -11,6 +11,7 @@ from twilio.base.exceptions import TwilioRestException
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from django.http import JsonResponse
+from datetime import date, timedelta
 
 twilio_client = Client('ACe4f586ddf64043984c3f813e1bf1232e', 'a12087fa31758795d95c38d240b87177') # Twilio
 sendgrid_client = SendGridAPIClient('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') # SendGrid
@@ -26,12 +27,24 @@ def login(request):
 	if request.user.is_authenticated:
 		return redirect('user_dashboard')
 	
-	if request.method == "POST":
+	if request.method == 'POST':
 		json_data = json.loads(request.body) #Put all contents of Post data into json_data variable
 		email = json_data['email'] #Reference the email key/value from the json_data variable
 		password = json_data['password']
 		user = authenticate(username=email, password=password)
 		if user is not None:
+			if (user.covid_status == 'Unknown' or user.last_update is None
+				or (user.last_update + timedelta(days=14)) < date.today()):
+					email = Mail(
+						from_email='CovidOnFlight@gmail.com',
+						to_emails=user.email,
+						subject='Please update your COVID status.',
+						html_content=('<h2><strong>Hello, ' + user.first_name + ' ' + user.last_name + '!'
+						'✈️</strong></h2><p>It\'s COVID on Flight speaking. We\'re here to ask you to '
+						'update your current COVID status to help inform and protect others! Thank you.</p>')
+					)
+					sendgrid_client.send(email)
+
 			return HttpResponse(user.id, status=200)
 		else:
 			return HttpResponse('Invalid Email/Password', status=401)
