@@ -129,7 +129,7 @@ def MyCovidStatus(request):
 
 	data = {
 		'status' : user.covid_status,
-		'last_update' : user.last_update,
+		'last_update' : lastupdt,
 		'last_flight' : lastflight.date
 	}
 
