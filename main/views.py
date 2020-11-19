@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.forms import User
 from django.contrib.auth import get_user_model
-from .models import COFUser
+from .models import *
 import json
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
@@ -112,7 +112,18 @@ def admin_dashboard(request):
 	return HttpResponse('Admin_Dashboard Vue ✈️')
 
 def admin_flight_search(request):
-	return HttpResponse('Admin_Dashboard Flight_Search ✈️')
+	json_data = json.loads(request.body)
+	from_date = json_data['from_date']
+	to_date = json_data['to_date']
+
+	flights = Flight.objects.filter(date__lte=to_date).filter(date__gte=from_date)
+
+	count = flights.count()
+	#flight_jsons = []
+	#for flight in flights:
+		
+
+	return HttpResponse(count)
 
 def account_settings(request):
 	json_data = json.loads(request.body)
