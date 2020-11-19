@@ -117,23 +117,23 @@ def MyCovidStatus(request):
 	id = json_data['id']
 	user = COFUser.objects.get(id=id)
 	lastupdt = user.last_update
-	tickets = FlightsTaken.objects.filter(email=user.email)
-	flightsid = (flight.flight_id for flight in tickets)
-	flights = Flight.objects.filter(flight_id__in=flightids)
-	lastflight = flights[1]
-	for flight in flights:
-		if flight.date < lastflight.date:
-			lastflight = flight
-	if lastupdt == null:
-		lastupdt = 'None'
+	#tickets = FlightsTaken.objects.filter(email=user.email)
+	#flightsid = (flight.flight_id for flight in tickets)
+	#flights = Flight.objects.filter(flight_id__in=flightids)
+	#lastflight = flights[1]
+	#for flight in flights:
+	#	if flight.date < lastflight.date:
+	#		lastflight = flight
+	#if lastupdt == null:
+	#	lastupdt = 'None'
 
-	data = {
+	user_data = {
 		'status' : user.covid_status,
 		'last_update' : lastupdt,
-		'last_flight' : lastflight.date
+		#'last_flight' : lastflight.date
 	}
 
-	return JsonReponse(data)
+	return JsonReponse(user_data)
 
 def account_settings(request):
 	json_data = json.loads(request.body)
