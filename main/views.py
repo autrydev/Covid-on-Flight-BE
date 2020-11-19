@@ -123,11 +123,27 @@ def admin_flight_search(request):
 	else:
 		count = flights.count()
 
-	#flight_jsons = []
-	#for flight in flights:
-		
+	flight_jsons = {}
+	i = 0
+	for flight in flights:
+		flight_json = {
+			"flightID" : flight.flight_id,
+			"departureCity" : flight.departure_city,
+			"arrivalCity" : flight.arrival_city,
+			"date" : flight.date,
+			"departureTime" : flight.departure_time,
+			"arrivalTime" : flight.arrival_time,
+			"covidCount" : flight.covid_count
+		}
+		flight_jsons[("flight" + str(i))] = flight_json
+		i += 1
 
-	return HttpResponse(count)
+	flight_output = {
+		"count" : count,
+		"flights" : flight_jsons
+	}
+
+	return JsonResponse(flight_output)
 
 def account_settings(request):
 	json_data = json.loads(request.body)
