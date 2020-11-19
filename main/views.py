@@ -118,7 +118,11 @@ def admin_flight_search(request):
 
 	flights = Flight.objects.filter(date__lte=to_date).filter(date__gte=from_date)
 
-	count = flights.count()
+	if flights is None:
+		count = 0
+	else:
+		count = flights.count()
+
 	#flight_jsons = []
 	#for flight in flights:
 		
