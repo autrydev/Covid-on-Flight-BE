@@ -109,7 +109,26 @@ def user_dashboard(request):
 	return HttpResponse('User_Dashboard Vue ✈️')
 
 def admin_dashboard(request):
-	return HttpResponse('Admin_Dashboard Vue ✈️')
+	unknown = 0
+	negative = 0
+	positive = 0
+	
+	users = COFUser.objects.all()
+	for user in users:
+		if user.covid_status == 'Unknown':
+			unknown += 1
+		elif user.covid_status == 'Negative':
+			negative += 1
+		elif user.covid_status == 'Positive':
+			positive += 1
+
+	statuses = {
+		'Unknown' : unknown,
+		'Negative' : negative,
+		'Positive' : positive
+	}
+
+	return JsonResponse(statuses)
 
 def account_settings(request):
 	json_data = json.loads(request.body)
