@@ -116,7 +116,7 @@ def MyCovidStatus(request):
 	id = json_data['id']
 	user = COFUser.objects.get(id=id)
 	lastupdt = user.last_update
-	tickets = FightsTaken.objects.objects.filter(email=user.email)
+	tickets = FlightsTaken.objects.objects.filter(email=user.email)
 	flightsid = (flight.flight_id for flight in tickets)
 	flights = Flight.objects.filter(flight_id__in=flightids)
 	lastflight = flights[1]
