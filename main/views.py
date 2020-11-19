@@ -27,22 +27,11 @@ def login(request):
 		return redirect('user_dashboard')
 	
 	if request.method == "POST":
-	#Uses Django Authentication
-
-		#These don't work:
-		#email = request.POST['email']
-		#password = request.POST['password']
-		#email = request.POST.get('email')
-		#password = request.POST.get('password')
-
-
 		json_data = json.loads(request.body) #Put all contents of Post data into json_data variable
 		email = json_data['email'] #Reference the email key/value from the json_data variable
 		password = json_data['password']
 		user = authenticate(username=email, password=password)
 		if user is not None:
-			#django_login(request,user)
-			#return redirect('user_dashboard')
 			return HttpResponse(user.id, status=200)
 		else:
 			return HttpResponse('Invalid Email/Password', status=401)
