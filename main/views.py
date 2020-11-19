@@ -108,6 +108,7 @@ def signup(request):
 def user_dashboard(request):
 	return HttpResponse('User_Dashboard Vue ✈️')
 
+
 def admin_dashboard(request):
 	return HttpResponse('Admin_Dashboard Vue ✈️')
 
@@ -116,7 +117,7 @@ def MyCovidStatus(request):
 	id = json_data['id']
 	user = COFUser.objects.get(id=id)
 	lastupdt = user.last_update
-	tickets = FlightsTaken.objects.objects.filter(email=user.email)
+	tickets = FlightsTaken.objects.filter(email=user.email)
 	flightsid = (flight.flight_id for flight in tickets)
 	flights = Flight.objects.filter(flight_id__in=flightids)
 	lastflight = flights[1]
