@@ -50,7 +50,7 @@ class COFUser(AbstractUser):
         max_length=8,
         default='Unknown',
     )
-    last_update = models.DateField(null=True, blank=True)
+    last_update = models.DateField(null=True, blank=True, default='None')
 
     objects = COFUserManager()
     USERNAME_FIELD = 'email'

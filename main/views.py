@@ -11,6 +11,7 @@ from twilio.base.exceptions import TwilioRestException
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from django.http import JsonResponse
+from operator import attrgetter
 
 twilio_client = Client('ACe4f586ddf64043984c3f813e1bf1232e', 'a12087fa31758795d95c38d240b87177') # Twilio
 sendgrid_client = SendGridAPIClient('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') # SendGrid
@@ -116,24 +117,17 @@ def MyCovidStatus(request):
 	json_data = json.loads(request.body)
 	id = json_data['id']
 	user = COFUser.objects.get(id=id)
-	lastupdt = user.last_update
-	#tickets = FlightsTaken.objects.filter(email=user.email)
-	#flightsid = (flight.flight_id for flight in tickets)
-	#flights = Flight.objects.filter(flight_id__in=flightids)
-	#lastflight = flights[1]
-	#for flight in flights:
-	#	if flight.date < lastflight.date:
-	#		lastflight = flight
-	#if lastupdt == null:
-	#	lastupdt = 'None'
+	flightids = FlightsTaken.objects.filter(email=user.email).values(flight_id)
+	flights = Flight.objects.filter(flight_id__in=flightids)
+	lastFlight = min(flights,key=attrgetter('date'))
 
 	user_data = {
 		'status' : user.covid_status,
-		'last_update' : lastupdt,
-		#'last_flight' : lastflight.date
+		'last_update' : user.last_update ,
+		'last_flight' : lastFlight
 	}
 
-	return JsonReponse(user_data)
+	return JsonResponse(user_data)
 
 def account_settings(request):
 	json_data = json.loads(request.body)
