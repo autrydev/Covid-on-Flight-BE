@@ -90,7 +90,7 @@ class Command(BaseCommand):
             self.stdout.write('============Flights============')
             today_date = datetime.datetime.now().date()
 
-            one_day_past = datetime.timedelta(days=0)
+            one_day_past = datetime.timedelta(days=1)
             lax_jfk = Flight.objects.create(
                 flight_id = 'DL1742',
                 departure_city = 'LAX',
