@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.forms import User
 from django.contrib.auth import get_user_model
-from .models import COFUser
+from .models import *
 import json
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
@@ -136,6 +136,8 @@ def send_code(request):
 		# Sends email (SendGrid)
 		recovery_code = random.choices(string.ascii_letters, k=6)
 		recovery_code = "".join(recovery_code)
+		rc = RecoveryCombination.objects.create(email=user, recovery_code=recovery_code)
+		rc.save()
 		try:
 			email = Mail(
 				from_email='CovidOnFlight@gmail.com',
