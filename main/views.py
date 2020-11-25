@@ -11,6 +11,8 @@ from twilio.base.exceptions import TwilioRestException
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from django.http import JsonResponse
+import string
+import random
 
 twilio_client = Client('ACe4f586ddf64043984c3f813e1bf1232e', 'a12087fa31758795d95c38d240b87177') # Twilio
 sendgrid_client = SendGridAPIClient('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') # SendGrid
@@ -125,3 +127,32 @@ def account_settings(request):
 	}
 
 	return JsonResponse(user_data)
+def send_code(request):
+	json_data = json.loads(request.body)
+	email = json_data['email']
+
+	user = COFUser.objects.get(email=email)
+	if user:
+		# Sends email (SendGrid)
+		recovery_code = random.choices(string.ascii_letters, k=6)
+		recovery_code = "".join(recovery_code)
+		try:
+			email = Mail(
+				from_email='CovidOnFlight@gmail.com',
+				to_emails=email,
+				subject='Reset Password',
+				html_content=(
+							'<h2><strong>Hi, ' + user.first_name + ' ' + user.last_name + '! ✈️</strong></h2><p>It appears that you have forgotten your password. Please use this code to reset your password: </p>' + recovery_code)
+			)
+			sendgrid_client.send(email)
+		except Exception as e:
+			print(e)
+
+		return HttpResponse(recovery_code, status=200)
+
+	else:
+		return HttpResponse("User does not exist :(", status=401)
+
+
+
+
