@@ -11,6 +11,7 @@ from twilio.base.exceptions import TwilioRestException
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from django.http import JsonResponse
+from datetime import date
 
 twilio_client = Client('ACe4f586ddf64043984c3f813e1bf1232e', 'a12087fa31758795d95c38d240b87177') # Twilio
 sendgrid_client = SendGridAPIClient('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') # SendGrid
@@ -107,6 +108,36 @@ def signup(request):
 
 def user_dashboard(request):
 	return HttpResponse('User_Dashboard Vue ✈️')
+
+
+def future_flights(request):
+	json_data = json.loads(request.body)
+	id = json_data['id']
+	user = COFUser.objects.get(id=id)
+
+	flightids = FlightsTaken.objects.filter(email=user.email).values(flight_id)
+	flights = Flight.objects.filter(flight_id__in=flightids, date > self.date)
+
+	flight_ids = (o.flight_id for o in flights)
+	departure_citys = (o.departure_city for o in flights)
+	arrival_citys = (o.arrival_city for o in flights)
+	dates = (o.date for o in flights)
+	departure_times = (o.departure_time for o in flights)
+	arrival_times = (o.arrival_time for o in flights)
+
+	data = {
+		'flight_ids' : flight_ids
+		'departure_citys' = departure_citys
+		'arrival_citys' = arrival_citys
+		'dates' = dates
+		'departure_times' = departure_times
+		'arrival_times' = arrival_times
+	}
+
+	return JsonResponse(data)
+
+
+
 
 def admin_dashboard(request):
 	return HttpResponse('Admin_Dashboard Vue ✈️')

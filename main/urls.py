@@ -9,5 +9,6 @@ urlpatterns = [
 	#path('admin_signup/', views.create_account, name='admin_signup'),
 	path('dashboard', views.user_dashboard, name='user_dashboard'),
 	path('accountsettings', views.account_settings, name='account_settings')
+	path('futureflights', views.future_flights, name='future_flights')
     #path('', views.login, name='login'),
 ]
