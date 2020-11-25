@@ -120,25 +120,26 @@ def user_dashboard(request):
 		for flight_taken in flights_taken:
 			flight = flight_taken.flight_id
 
-			if flight.covid_count > 0:
-				status = 'Positive'
-			else:
-				status = 'Negative'
+			if flight.date < date.today(): # if in the past
+				if flight.covid_count > 0:
+					status = 'Positive'
+				else:
+					status = 'Negative'
 
-			flight_json = {
-				"flight_id" : flight.flight_id,
-				"date" : flight.date,
-				"departure_city" : flight.departure_city,
-				"arrival_city" : flight.arrival_city,
-				"status" : status
-			}
+				flight_json = {
+					"flight_id" : flight.flight_id,
+					"date" : flight.date,
+					"departure_city" : flight.departure_city,
+					"arrival_city" : flight.arrival_city,
+					"status" : status
+				}
 
-			flights_json[("flight" + str(i))] = flight_json
-			i += 1
+				flights_json[("flight" + str(i))] = flight_json
+				i += 1
 		return_data = flights_json
 	else:
 		return_data = {
-			"flight" : ""
+			"flight0" : ""
 		}
 
 
