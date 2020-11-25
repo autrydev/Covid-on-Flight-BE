@@ -4,13 +4,14 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.forms import User
 from django.contrib.auth import get_user_model
-from .models import COFUser
+from .models import COFUser, FlightsTaken, Flight, Survey
 import json
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from django.http import JsonResponse
+from datetime import date
 
 twilio_client = Client('ACe4f586ddf64043984c3f813e1bf1232e', 'a12087fa31758795d95c38d240b87177') # Twilio
 sendgrid_client = SendGridAPIClient('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') # SendGrid
@@ -106,7 +107,42 @@ def signup(request):
 			return HttpResponse(py_user.id, status=200)
 
 def user_dashboard(request):
-	return HttpResponse('User_Dashboard Vue ✈️')
+	json_data = json.loads(request.body)
+	id = json_data['id']
+
+	# Collect previous flight history
+	email = COFUser.objects.get(id=id).email
+	flights_taken = FlightsTaken.objects.select_related('email', 'flight_id').filter(email=id)
+
+	if flights_taken: # if the user has taken a flight
+		flights_json = {}
+		i = 0
+		for flight_taken in flights_taken:
+			flight = flight_taken.flight_id
+
+			if flight.covid_count > 0:
+				status = 'Positive'
+			else:
+				status = 'Negative'
+
+			flight_json = {
+				"flight_id" : flight.flight_id,
+				"date" : flight.date,
+				"departure_city" : flight.departure_city,
+				"arrival_city" : flight.arrival_city,
+				"status" : status
+			}
+
+			flights_json[("flight" + str(i))] = flight_json
+			i += 1
+		return_data = flights_json
+	else:
+		return_data = {
+			"flight" : ""
+		}
+
+
+	return JsonResponse(return_data)
 
 def admin_dashboard(request):
 	return HttpResponse('Admin_Dashboard Vue ✈️')
