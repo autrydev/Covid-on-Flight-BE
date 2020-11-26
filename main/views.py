@@ -128,32 +128,33 @@ def account_settings(request):
 
 	return JsonResponse(user_data)
 def send_code(request):
-	json_data = json.loads(request.body)
-	email = json_data['email']
+	if request.method == "POST":
+		json_data = json.loads(request.body)
+		email = json_data['email']
+		
+		user = COFUser.objects.get(email=email)
+		if user:
+			# Sends email (SendGrid)
+			recovery_code = random.choices(string.ascii_letters, k=6)
+			recovery_code = "".join(recovery_code)
+			rc = RecoveryCombination.objects.create(email=user, recovery_code=recovery_code)
+			rc.save()
+			try:
+				email = Mail(
+					from_email='CovidOnFlight@gmail.com',
+					to_emails=email,
+					subject='Reset Password',
+					html_content=(
+								'<h2><strong>Hi, ' + user.first_name + ' ' + user.last_name + '! ✈️</strong></h2><p>It appears that you have forgotten your password. Please use this code to reset your password: </p>' + recovery_code)
+				)
+				sendgrid_client.send(email)
+			except Exception as e:
+				print(e)
 
-	user = COFUser.objects.get(email=email)
-	if user:
-		# Sends email (SendGrid)
-		recovery_code = random.choices(string.ascii_letters, k=6)
-		recovery_code = "".join(recovery_code)
-		rc = RecoveryCombination.objects.create(email=user, recovery_code=recovery_code)
-		rc.save()
-		try:
-			email = Mail(
-				from_email='CovidOnFlight@gmail.com',
-				to_emails=email,
-				subject='Reset Password',
-				html_content=(
-							'<h2><strong>Hi, ' + user.first_name + ' ' + user.last_name + '! ✈️</strong></h2><p>It appears that you have forgotten your password. Please use this code to reset your password: </p>' + recovery_code)
-			)
-			sendgrid_client.send(email)
-		except Exception as e:
-			print(e)
+			return HttpResponse(recovery_code, status=200)
 
-		return HttpResponse(recovery_code, status=200)
-
-	else:
-		return HttpResponse("User does not exist :(", status=401)
+		else:
+			return HttpResponse("User does not exist :(", status=401)
 
 
 
