@@ -136,9 +136,7 @@ def user_dashboard(request):
 				flights_json.append(flight_json)
 		return_data = flights_json
 	else:
-		return_data = {
-			"flight0" : ""
-		}
+		return_data = []
 
 
 	return JsonResponse(return_data, safe=False)
