@@ -114,32 +114,40 @@ def user_dashboard(request):
 	email = COFUser.objects.get(id=id).email
 	flights_taken = FlightsTaken.objects.select_related('email', 'flight_id').filter(email=id)
 
+	future_flights_json = []
+	prev_flights_json = []
+	
 	if flights_taken: # if the user has taken a flight
-		flights_json = []
 		for flight_taken in flights_taken:
 			flight = flight_taken.flight_id
 
+			if flight.covid_count > 0:
+				status = 'Positive'
+			else:
+				status = 'Negative'
+
+			flight_json = {
+				"flight_id" : flight.flight_id,
+				"date" : flight.date,
+				"departure_city" : flight.departure_city,
+				"arrival_city" : flight.arrival_city,
+				"status" : status
+			}
+
 			if flight.date < date.today(): # if in the past
-				if flight.covid_count > 0:
-					status = 'Positive'
-				else:
-					status = 'Negative'
+				prev_flights_json.append(flight_json)
+			else: #if today or in the future
+				future_flights_json.append(flight_json)
 
-				flight_json = {
-					"flight_id" : flight.flight_id,
-					"date" : flight.date,
-					"departure_city" : flight.departure_city,
-					"arrival_city" : flight.arrival_city,
-					"status" : status
-				}
+	user = COFUser.objects.get(id=id)
 
-				flights_json.append(flight_json)
-		return_data = flights_json
-	else:
-		return_data = []
+	dash_data = {
+		'firstname': user.first_name,
+		'prev_flights': prev_flights_json,
+		'future_flights': future_flights_json
+	}
 
-
-	return JsonResponse(return_data, safe=False)
+	return JsonResponse(dash_data, safe=False)
 	
 
 def admin_dashboard(request):
