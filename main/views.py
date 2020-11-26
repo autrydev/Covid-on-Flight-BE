@@ -115,8 +115,7 @@ def user_dashboard(request):
 	flights_taken = FlightsTaken.objects.select_related('email', 'flight_id').filter(email=id)
 
 	if flights_taken: # if the user has taken a flight
-		flights_json = {}
-		i = 0
+		flights_json = []
 		for flight_taken in flights_taken:
 			flight = flight_taken.flight_id
 
@@ -134,8 +133,7 @@ def user_dashboard(request):
 					"status" : status
 				}
 
-				flights_json[("flight" + str(i))] = flight_json
-				i += 1
+				flights_json.append(flight_json)
 		return_data = flights_json
 	else:
 		return_data = {
@@ -143,7 +141,8 @@ def user_dashboard(request):
 		}
 
 
-	return JsonResponse(return_data)
+	return JsonResponse(return_data, safe=False)
+	
 
 def admin_dashboard(request):
 	return HttpResponse('Admin_Dashboard Vue ✈️')
