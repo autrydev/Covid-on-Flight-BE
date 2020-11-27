@@ -4,13 +4,14 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.forms import User
 from django.contrib.auth import get_user_model
-from .models import COFUser
+from .models import *
 import json
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from django.http import JsonResponse
+from datetime import date
 
 twilio_client = Client('ACe4f586ddf64043984c3f813e1bf1232e', 'a12087fa31758795d95c38d240b87177') # Twilio
 sendgrid_client = SendGridAPIClient('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') # SendGrid
@@ -109,6 +110,7 @@ def user_dashboard(request):
 	return HttpResponse('User_Dashboard Vue ✈️')
 
 def admin_dashboard(request):
+	# Get counts in all statuses
 	unknown = 0
 	negative = 0
 	positive = 0
@@ -122,13 +124,29 @@ def admin_dashboard(request):
 		elif user.covid_status == 'Positive':
 			positive += 1
 
-	statuses = {
+	# Get all previous flights that had COVID-positive passengers (count > 0)
+	flights = Flight.objects.all()
+	positive_flights = []
+	for flight in flights:
+		if flight.date < date.today() and flight.covid_count > 0:
+			flight_json = {
+				"flight_id" : flight.flight_id,
+				"date" : flight.date,
+				"departure_city" : flight.departure_city,
+				"arrival_city" : flight.arrival_city,
+				"count" : flight.covid_count
+			}
+
+			positive_flights.append(flight_json)
+
+	output = {
 		'Unknown' : unknown,
 		'Negative' : negative,
-		'Positive' : positive
+		'Positive' : positive,
+		'positive_flights' : positive_flights
 	}
 
-	return JsonResponse(statuses)
+	return JsonResponse(output)
 
 def account_settings(request):
 	json_data = json.loads(request.body)
