@@ -135,10 +135,10 @@ def admin_flight_search(request):
 	if json_data['flight_id'] is not None:
 		flights = flights.filter(flight_id=json_data['flight_id'])
 
-	if json_data['status'] is not None:
-		if json_data['status'] == True:
+	if json_data['covidStatus'] is not None:
+		if json_data['covidStatus'] == True:
 			flights = flights.filter(covid_count__gt=0)
-		elif json_data['status'] == False:
+		elif json_data['covidStatus'] == False:
 			flights = flights.filter(covid_count=0)
 
 	flight_jsons = []
