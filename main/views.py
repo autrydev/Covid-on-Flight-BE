@@ -140,11 +140,6 @@ def admin_flight_search(request):
 			flights = flights.filter(covid_count__gte=0)
 		elif json_data['status'] == 'Negative':
 			flights = flights.filter(covid_count=0)
-	
-	if flights is None:
-		count = 0
-	else:
-		count = flights.count()
 
 	flight_jsons = []
 	for flight in flights:
@@ -160,7 +155,6 @@ def admin_flight_search(request):
 		flight_jsons.append(flight_json)
 
 	flight_output = {
-		"count" : count,
 		"flights" : flight_jsons
 	}
 
