@@ -116,26 +116,26 @@ def admin_flight_search(request):
 	keys = json_data.keys()
 	flights = Flight.objects.all()
 
-	if 'from_date' in keys:
+	if json_data['from_date'] is not None:
 		from_date = json_data['from_date']
 		from_date = from_date[0:4] + '-' + from_date[5:7] + '-' + from_date[8:10]
 		flights = flights.filter(date__gte=from_date)
 
-	if 'to_date' in keys:
+	if json_data['to_date'] is not None:
 		to_date = json_data['to_date']
 		to_date = to_date[0:4] + '-' + to_date[5:7] + '-' + to_date[8:10]
 		flights = flights.filter(date__lte=to_date)
 	
-	if 'departure_city' in keys:
+	if json_data['departure_city'] is not None:
 		flights = flights.filter(departure_city=json_data['departure_city'])
 	
-	if 'arrival_city' in keys:
+	if json_data['arrival_city'] is not None:
 		flights = flights.filter(arrival_city=json_data['arrival_city'])
 
-	if 'flight_id' in keys:
+	if json_data['flight_id'] is not None:
 		flights = flights.filter(flight_id=json_data['flight_id'])
 
-	if 'status' in keys:
+	if json_data['status'] is not None:
 		if json_data['status'] == True:
 			flights = flights.filter(covid_count__gt=0)
 		elif json_data['status'] == False:
