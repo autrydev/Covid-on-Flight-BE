@@ -140,8 +140,7 @@ def admin_flight_search(request):
 	else:
 		count = flights.count()
 
-	flight_jsons = {}
-	i = 0
+	flight_jsons = []
 	for flight in flights:
 		flight_json = {
 			"flightID" : flight.flight_id,
@@ -152,8 +151,7 @@ def admin_flight_search(request):
 			"arrivalTime" : flight.arrival_time,
 			"covidCount" : flight.covid_count
 		}
-		flight_jsons[("flight" + str(i))] = flight_json
-		i += 1
+		flight_jsons.append(flight_json)
 
 	flight_output = {
 		"count" : count,
