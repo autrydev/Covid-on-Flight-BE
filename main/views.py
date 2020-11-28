@@ -136,9 +136,9 @@ def admin_flight_search(request):
 		flights = flights.filter(flight_id=json_data['flight_id'])
 
 	if 'status' in keys:
-		if json_data['status'] == 'Positive':
+		if json_data['status'] == True:
 			flights = flights.filter(covid_count__gt=0)
-		elif json_data['status'] == 'Negative':
+		elif json_data['status'] == False:
 			flights = flights.filter(covid_count=0)
 
 	flight_jsons = []
