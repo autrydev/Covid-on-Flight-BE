@@ -11,6 +11,7 @@ from twilio.base.exceptions import TwilioRestException
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from django.http import JsonResponse
+from time import gmtime, strftime
 
 twilio_client = Client('ACe4f586ddf64043984c3f813e1bf1232e', 'a12087fa31758795d95c38d240b87177') # Twilio
 sendgrid_client = SendGridAPIClient('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') # SendGrid
@@ -160,11 +161,45 @@ def admin_flight_search(request):
 
 	return JsonResponse(flight_output)
 
+def covidstatus(request):
+	json_data = json.loads(request.body)
+	id = json_data['id']
+
+	user = COFUser.objects.get(id=id)
+
+	flightids = FlightsTaken.objects.filter(email=user.email).values(flight_id)
+	planes = Flight.objects.filter(flight_id__in=flightids)
+	last = min(planes,key=attrgetter('date'))
+
+	if request.method == "POST":
+		stat = json_data['covid_status']
+		user.covid_status = stat
+		user.last_update = datetime.datetime.now()
+		user.save()
+
+	user_data = {
+		'covidstatus' : user.covid_status,
+		'lastupdate' : user.last_update,
+		'lastflight' : last
+	}
+
+	return JsonResponse(user_data)
+
+
 def account_settings(request):
 	json_data = json.loads(request.body)
 	id = json_data['id']
 
 	user = COFUser.objects.get(id=id)
+
+	if request.method == "POST":
+		fname = json_data['first_name']
+		lname = json_data['last_name']
+		nemail = json_data['email']
+		user.first_name = fname
+		user.last_name = lname
+		user.email = nemail
+		user.save()
 
 	user_data = {
 		'firstName' : user.first_name,
