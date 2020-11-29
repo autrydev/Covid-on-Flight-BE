@@ -168,10 +168,10 @@ def covidstatus(request):
 
 	user = COFUser.objects.get(id=id)
 
-	flights = FlightsTaken.objects.filter(email=user.email)
-	fids = (plane.flight_id for plane in flights)
-	planes = Flight.objects.filter(flight_id__in=fids)
-	last = min(planes,key=attrgetter('date'))
+	#flights = FlightsTaken.objects.filter(email=user.email)
+	#fids = (plane.flight_id for plane in flights)
+	#planes = Flight.objects.filter(flight_id__in=fids)
+	#last = min(planes,key=attrgetter('date'))
 	
 
 	if request.method == "POST":
