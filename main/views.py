@@ -167,7 +167,7 @@ def covidstatus(request):
 
 	user = COFUser.objects.get(id=id)
 
-	flightids = FlightsTaken.objects.filter(email=user.email).values(flight_id)
+	flightids = FlightsTaken.objects.filter(email=user.id).values(flight_id)
 	planes = Flight.objects.filter(flight_id__in=flightids)
 	last = min(planes,key=attrgetter('date'))
 
