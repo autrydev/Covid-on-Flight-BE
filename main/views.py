@@ -164,20 +164,21 @@ def admin_flight_search(request):
 def covidstatus(request):
 	json_data = json.loads(request.body)
 	id = json_data['id']
+	last = 'None'
 
 	user = COFUser.objects.get(id=id)
 
-	##flights = FlightsTaken.objects.filter(email=user.email)
-	##fids = (plane.flight_id for plane in flights)
-	##planes = Flight.objects.filter(flight_id__in=flightids)
-	##last = min(planes,key=attrgetter('date'))
-	last = 'None'
+	flights = FlightsTaken.objects.filter(email=user.email)
+	fids = (plane.flight_id for plane in flights)
+	planes = Flight.objects.filter(flight_id__in=fids)
+	last = min(planes,key=attrgetter('date'))
+	
 
-	##if request.method == "POST":
-	##	stat = json_data['covid_status']
-	##	user.covid_status = stat
-	##	user.last_update = datetime.datetime.now()
-	##	user.save()
+	if request.method == "POST":
+		stat = json_data['covid_status']
+		user.covid_status = stat
+		user.last_update = datetime.datetime.now()
+		user.save()
 
 	user_data = {
 		'covidstatus' : user.covid_status,
