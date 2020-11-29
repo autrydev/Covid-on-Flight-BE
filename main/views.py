@@ -167,15 +167,17 @@ def covidstatus(request):
 
 	user = COFUser.objects.get(id=id)
 
-	flightids = FlightsTaken.objects.filter(email=user.email).values(flight_id)
-	planes = Flight.objects.filter(flight_id__in=flightids)
-	last = min(planes,key=attrgetter('date'))
+	##flights = FlightsTaken.objects.filter(email=user.email)
+	##fids = (plane.flight_id for plane in flights)
+	##planes = Flight.objects.filter(flight_id__in=flightids)
+	##last = min(planes,key=attrgetter('date'))
+	last = 'None'
 
-	if request.method == "POST":
-		stat = json_data['covid_status']
-		user.covid_status = stat
-		user.last_update = datetime.datetime.now()
-		user.save()
+	##if request.method == "POST":
+	##	stat = json_data['covid_status']
+	##	user.covid_status = stat
+	##	user.last_update = datetime.datetime.now()
+	##	user.save()
 
 	user_data = {
 		'covidstatus' : user.covid_status,
