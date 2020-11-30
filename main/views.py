@@ -184,7 +184,7 @@ def reset_password(request):
 		user = COFUser.objects.get(email=email)
 
 		if user:
-			user.password = json_data['password']
+			user.set_password(password)
 			user.save()
 			return HttpResponse("Password Changed", status=200)
 
