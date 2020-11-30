@@ -164,6 +164,7 @@ def admin_flight_search(request):
 def covidstatus(request):
 	json_data = json.loads(request.body)
 	id = json_data['id']
+	req = json_data['requestType']
 	last = 'None'
 
 	user = COFUser.objects.get(id=id)
@@ -199,6 +200,7 @@ def account_settings(request):
 		fname = json_data['first_name']
 		lname = json_data['last_name']
 		nemail = json_data['email']
+		nphone = json_data['phone_number']
 		user.first_name = fname
 		user.last_name = lname
 		user.email = nemail
