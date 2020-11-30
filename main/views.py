@@ -157,5 +157,24 @@ def send_code(request):
 			return HttpResponse("User does not exist :(", status=401)
 
 
+def check_code(request):
+	if request.method == "POST":
+		json_data = json.loads(request.body)
+		verification_code=json_data['code']
+		email = json_data['email']
+
+		#RecoveryCombination requires an actual user to retrieve the email. As Such a variable must be created that
+		#stores the user. That user can then be used for RecoveryCombination.
+		user_object = COFUser.objects.get(email=email)
+		user = RecoveryCombination.objects.get(email=user_object)#This pulls the email 'key' from the COFUser object
+		if user:
+			if verification_code == user.recovery_code:
+				RecoveryCombination.objects.filter(email=user_object).delete()
+				return HttpResponse(verification_code, status=200)
+
+		else:
+			return HttpResponse("User does not exist :(", status=401)
+
+
 
 
