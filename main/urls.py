@@ -10,6 +10,7 @@ urlpatterns = [
 	path('dashboard', views.user_dashboard, name='user_dashboard'),
 	path('accountsettings', views.account_settings, name='account_settings'),
 	path('sendcode', views.send_code, name='send_code'),
-	path('checkcode', views.check_code, name='check_code')
+	path('checkcode', views.check_code, name='check_code'),
+	path('resetpassword', views.reset_password, name='reset_password')
     #path('', views.login, name='login'),
 ]

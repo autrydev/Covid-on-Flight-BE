@@ -174,6 +174,22 @@ def check_code(request):
 
 		else:
 			return HttpResponse("User does not exist :(", status=401)
+def reset_password(request):
+	if request.method == "POST":
+		json_data = json.loads(request.body)
+		password=json_data['password']
+		email = json_data['email']
+
+
+		user = COFUser.objects.get(email=email)
+
+		if user:
+			user.password = json_data['password']
+			user.save()
+			return HttpResponse("Password Changed", status=200)
+
+		else:
+			return HttpResponse("An error has occured", status=401)
 
 
 
