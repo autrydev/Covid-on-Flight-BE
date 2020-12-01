@@ -4,7 +4,7 @@ from django.contrib.auth import authenticate
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from django.contrib.auth.forms import User
 from django.contrib.auth import get_user_model
-from .models import COFUser
+from .models import *
 import json
 from twilio.rest import Client
 from twilio.base.exceptions import TwilioRestException
@@ -110,6 +110,55 @@ def user_dashboard(request):
 
 def admin_dashboard(request):
 	return HttpResponse('Admin_Dashboard Vue ✈️')
+
+def admin_flight_search(request):
+	json_data = json.loads(request.body)
+	keys = json_data.keys()
+	flights = Flight.objects.all()
+
+	if json_data['from_date'] is not None:
+		from_date = json_data['from_date']
+		from_date = from_date[0:4] + '-' + from_date[5:7] + '-' + from_date[8:10]
+		flights = flights.filter(date__gte=from_date)
+
+	if json_data['to_date'] is not None:
+		to_date = json_data['to_date']
+		to_date = to_date[0:4] + '-' + to_date[5:7] + '-' + to_date[8:10]
+		flights = flights.filter(date__lte=to_date)
+	
+	if json_data['departure_city'] is not None:
+		flights = flights.filter(departure_city=json_data['departure_city'])
+	
+	if json_data['arrival_city'] is not None:
+		flights = flights.filter(arrival_city=json_data['arrival_city'])
+
+	if json_data['flight_id'] is not None:
+		flights = flights.filter(flight_id=json_data['flight_id'])
+
+	if json_data['covidStatus'] is not None:
+		if json_data['covidStatus'] == True:
+			flights = flights.filter(covid_count__gt=0)
+		elif json_data['covidStatus'] == False:
+			flights = flights.filter(covid_count=0)
+
+	flight_jsons = []
+	for flight in flights:
+		flight_json = {
+			"flightID" : flight.flight_id,
+			"departureCity" : flight.departure_city,
+			"arrivalCity" : flight.arrival_city,
+			"date" : flight.date,
+			"departureTime" : flight.departure_time,
+			"arrivalTime" : flight.arrival_time,
+			"covidCount" : flight.covid_count
+		}
+		flight_jsons.append(flight_json)
+
+	flight_output = {
+		"flights" : flight_jsons
+	}
+
+	return JsonResponse(flight_output)
 
 def account_settings(request):
 	json_data = json.loads(request.body)
