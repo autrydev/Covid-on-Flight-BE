@@ -107,7 +107,48 @@ def signup(request):
 			return HttpResponse(py_user.id, status=200)
 
 def user_dashboard(request):
-	return HttpResponse('User_Dashboard Vue ✈️')
+	json_data = json.loads(request.body)
+	id = json_data['id']
+
+	# Collect previous flight history
+	email = COFUser.objects.get(id=id).email
+	flights_taken = FlightsTaken.objects.select_related('email', 'flight_id').filter(email=id)
+
+	future_flights_json = []
+	prev_flights_json = []
+	
+	if flights_taken: # if the user has taken a flight
+		for flight_taken in flights_taken:
+			flight = flight_taken.flight_id
+
+			if flight.covid_count > 0:
+				status = 'Positive'
+			else:
+				status = 'Negative'
+
+			flight_json = {
+				"flight_id" : flight.flight_id,
+				"date" : flight.date,
+				"departure_city" : flight.departure_city,
+				"arrival_city" : flight.arrival_city,
+				"status" : status
+			}
+
+			if flight.date < date.today(): # if in the past
+				prev_flights_json.append(flight_json)
+			else: #if today or in the future
+				future_flights_json.append(flight_json)
+
+	user = COFUser.objects.get(id=id)
+
+	dash_data = {
+		'firstname': user.first_name,
+		'prev_flights': prev_flights_json,
+		'future_flights': future_flights_json
+	}
+
+	return JsonResponse(dash_data, safe=False)
+	
 
 def admin_dashboard(request):
 	# Get counts in all statuses
@@ -147,6 +188,55 @@ def admin_dashboard(request):
 	}
 
 	return JsonResponse(output)
+
+def admin_flight_search(request):
+	json_data = json.loads(request.body)
+	keys = json_data.keys()
+	flights = Flight.objects.all()
+
+	if json_data['from_date'] is not None:
+		from_date = json_data['from_date']
+		from_date = from_date[0:4] + '-' + from_date[5:7] + '-' + from_date[8:10]
+		flights = flights.filter(date__gte=from_date)
+
+	if json_data['to_date'] is not None:
+		to_date = json_data['to_date']
+		to_date = to_date[0:4] + '-' + to_date[5:7] + '-' + to_date[8:10]
+		flights = flights.filter(date__lte=to_date)
+	
+	if json_data['departure_city'] is not None:
+		flights = flights.filter(departure_city=json_data['departure_city'])
+	
+	if json_data['arrival_city'] is not None:
+		flights = flights.filter(arrival_city=json_data['arrival_city'])
+
+	if json_data['flight_id'] is not None:
+		flights = flights.filter(flight_id=json_data['flight_id'])
+
+	if json_data['covidStatus'] is not None:
+		if json_data['covidStatus'] == True:
+			flights = flights.filter(covid_count__gt=0)
+		elif json_data['covidStatus'] == False:
+			flights = flights.filter(covid_count=0)
+
+	flight_jsons = []
+	for flight in flights:
+		flight_json = {
+			"flightID" : flight.flight_id,
+			"departureCity" : flight.departure_city,
+			"arrivalCity" : flight.arrival_city,
+			"date" : flight.date,
+			"departureTime" : flight.departure_time,
+			"arrivalTime" : flight.arrival_time,
+			"covidCount" : flight.covid_count
+		}
+		flight_jsons.append(flight_json)
+
+	flight_output = {
+		"flights" : flight_jsons
+	}
+
+	return JsonResponse(flight_output)
 
 def account_settings(request):
 	json_data = json.loads(request.body)

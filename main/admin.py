@@ -42,6 +42,9 @@ class COFUserUpdateForm(forms.ModelForm):
     # "python3 manage.py changepassword email" works if necessary
     password = ReadOnlyPasswordHashField()
 
+    def clean_password(self):
+        return self.initial['password']
+
     # COFUser object's attributes
     class Meta:
         model = COFUser
