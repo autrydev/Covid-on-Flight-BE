@@ -164,7 +164,6 @@ def admin_flight_search(request):
 def covidstatus(request):
 	json_data = json.loads(request.body)
 	id = json_data['id']
-	req = json_data['requestType']
 	last = 'None'
 
 	user = COFUser.objects.get(id=id)
@@ -175,21 +174,19 @@ def covidstatus(request):
 	#planes = Flight.objects.filter(flight_id__in=fids)
 	last = min(flights,key=attrgetter('date'))
 	
-	if request.method == "POST":
-		if "covid_status" in json_data:
+	if "covid_status" in json_data:
+		stat = json_data['covid_status']
+		user.covid_status = stat
+		user.last_update = datetime.datetime.now()
+		user.save()
 
-			stat = json_data['covid_status']
-			user.covid_status = stat
-			user.last_update = datetime.datetime.now()
-			user.save()
-
-		if user.covid_status == "Positive" || "positive"
-			# Sends SMS (Twilio)
+	if user.covid_status == "Positive" || "positive"
+		# Sends SMS (Twilio)
 			try:
 				twilio_client.messages.create(
-					body=('Thank you for signing up for Covid on Flight, ' + first_name + ' ' + last_name + '!'),
-					from_='+12185304600',
-					to=('+1'+user.phone_number)
+				body=('Thank you for signing up for Covid on Flight, ' + first_name + ' ' + last_name + '!'),
+				from_='+12185304600',
+				to=('+1'+user.phone_number)
 				)
 			except TwilioRestException:
 				print('Error texting user')
@@ -197,12 +194,11 @@ def covidstatus(request):
 			# Sends email (SendGrid)
 			try:
 				email = Mail(
-					from_email='CovidOnFlight@gmail.com',
-					to_emails=user.email,
-					subject='Welcome to Covid on Flight!',
-					html_content=('<h2><strong>Hi, ' + first_name + ' ' + last_name + '! ✈️</strong></h2><p>Welcome to Covid on Flight! We look forward to making your travels safer.</p>')
+				from_email='CovidOnFlight@gmail.com',
+				to_emails=user.email,
+				subject='Welcome to Covid on Flight!',
+				html_content=('<h2><strong>Hi, ' + first_name + ' ' + last_name + '! ✈️</strong></h2><p>Welcome to Covid on Flight! We look forward to making your travels safer.</p>')
 				)
-
 				sendgrid_client.send(email)
 			except Exception as e:
 				print(e)
@@ -222,15 +218,20 @@ def account_settings(request):
 
 	user = COFUser.objects.get(id=id)
 
-	#if request.method == "POST":
-	#	fname = json_data['first_name']
-	#	lname = json_data['last_name']
-	#	nemail = json_data['email']
-	#	nphone = json_data['phone_number']
-	#	user.first_name = fname
-	#	user.last_name = lname
-	#	user.email = nemail
-	#	user.save()
+	if "first_name" in json_data:
+		fname = json_data['first_name']
+		user.first_name = fname
+	if "last_name" in json_data:
+		lname = json_data['last_name']
+		user.last_name = lname
+	if "email" in json_data:
+		nemail = json_data['email']
+		user.email = nemail
+	if "phone_number" in json_data:
+		nphone = json_data['phone_number']
+		user.phone_number = nphone
+	
+	user.save()
 
 	user_data = {
 		'firstName' : user.first_name,
