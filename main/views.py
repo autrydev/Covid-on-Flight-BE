@@ -168,45 +168,112 @@ def covidstatus(request):
 
 	user = COFUser.objects.get(id=id)
 
-	tickets = FlightsTaken.objects.get(email=user.email)
-	#flights = plane.flight_id for plane in tickets
-	flights = tickets.flight_id.all()
-	#planes = Flight.objects.filter(flight_id__in=fids)
-	last = min(flights,key=attrgetter('date'))
+	tickets = FlightsTaken.objects.filter(email=user.id) #References user id instead of email. Use filter instead of get
+	flights = tickets.values("flight_id")
+	planes = Flight.objects.filter(pk__in=flights)
+	last = planes.order_by('date').last().date
 	
-	if "covid_status" in json_data:
-		stat = json_data['covid_status']
-		user.covid_status = stat
-		user.last_update = datetime.datetime.now()
-		user.save()
-
-	if user.covid_status == "Positive" || "positive"
-		# Sends SMS (Twilio)
-			try:
-				twilio_client.messages.create(
-				body=('Thank you for signing up for Covid on Flight, ' + first_name + ' ' + last_name + '!'),
-				from_='+12185304600',
-				to=('+1'+user.phone_number)
-				)
-			except TwilioRestException:
-				print('Error texting user')
-
+	#if user.covid_status == "Positive" or user.covid_status == "positive" :
+	#	# Sends SMS (Twilio)
+	#		try:
+	#			twilio_client.messages.create(
+	#			body=('Thank you for signing up for Covid on Flight, ' + first_name + ' ' + last_name + '!'),
+	#			from_='+12185304600',
+	#			to=('+1'+user.phone_number)
+	#			)
+	#		except TwilioRestException:
+	#			print('Error texting user')
+	#
 			# Sends email (SendGrid)
-			try:
-				email = Mail(
-				from_email='CovidOnFlight@gmail.com',
-				to_emails=user.email,
-				subject='Welcome to Covid on Flight!',
-				html_content=('<h2><strong>Hi, ' + first_name + ' ' + last_name + '! ✈️</strong></h2><p>Welcome to Covid on Flight! We look forward to making your travels safer.</p>')
-				)
-				sendgrid_client.send(email)
-			except Exception as e:
-				print(e)
+	#		try:
+	#			email = Mail(
+	#			from_email='CovidOnFlight@gmail.com',
+	#			to_emails=user.email,
+	#			subject='Welcome to Covid on Flight!',
+	#			html_content=('<h2><strong>Hi, ' + first_name + ' ' + last_name + '! ✈️</strong></h2><p>Welcome to Covid on Flight! We look forward to making your travels safer.</p>')
+	#			)
+	#			sendgrid_client.send(email)
+	#		except Exception as e:
+	#			print(e)
 		
 	user_data = {
 		'covidstatus' : user.covid_status,
 		'lastupdate' : user.last_update,
 		'lastflight' : last
+	}
+
+	return JsonResponse(user_data)
+
+def updatecovidstatus(request):
+	json_data = json.loads(request.body)
+	id = json_data['id']
+	user = COFUser.objects.get(id=id)
+
+	if request.method == "POST":
+		surv = Survey()
+		surv.test_results='No'
+	if "covid_test" in json_data:
+		if json_data['covid_test'] == 'Yes':
+			surv.covid_test=True
+		else:
+			surv.covid_test=False
+	if "fever_chills" in json_data:
+		if json_data['fever_chills'] == 'True' or json_data['fever_chills'] == 'true':
+			surv.fever_chills=True
+			surv.test_results="Yes"
+			user.covid_status = "Positive"	
+	if "cough" in json_data:
+		if json_data['cough'] == 'True' or json_data['cough'] == 'true':
+			surv.cough=True
+			surv.test_results="Yes"
+			user.covid_status = "Positive"	
+	if "breathing_issues" in json_data:
+		if json_data['breathing_issues'] == 'True' or json_data['breathing_issues'] == 'true':
+			surv.breathing_issues=True
+			surv.test_results="Yes"
+			user.covid_status = "Positive"	
+	if "aches" in json_data:
+		if json_data['aches'] == 'True' or json_data['aches'] == 'true':
+			surv.aches=True
+			surv.test_results="Yes"
+			user.covid_status = "Positive"	
+	if "headache" in json_data:
+		if json_data['headache'] == 'True' or json_data['headache'] == 'true':
+			surv.headache=True
+			surv.test_results="Yes"
+			user.covid_status = "Positive"	
+	if "loss_taste_smell" in json_data:
+		if json_data['loss_taste_smell'] == 'True' or json_data['loss_taste_smell'] == 'true':
+			surv.loss_taste_smell=True
+			surv.test_results="Yes"
+			user.covid_status = "Positive"	
+	if "sore_throat" in json_data:
+		if json_data['sore_throat'] == 'True' or json_data['sore_throat'] == 'true':
+			surv.sore_throat=True
+			surv.test_results="Yes"
+			user.covid_status = "Positive"	
+	if "congestion" in json_data:
+		if json_data['congestion'] == 'True' or json_data['congestion'] == 'true':
+			surv.congestion=True
+			surv.test_results="Yes"
+			user.covid_status = "Positive"		
+	if "nausea" in json_data:
+		if json_data['nausea'] == 'True' or json_data['nausea'] == 'true':
+			surv.nausea=True
+			surv.test_results="Yes"
+			user.covid_status = "Positive"
+	if "diarrhea" in json_data:
+		if json_data['diarrhea'] == 'True' or json_data['diarrhea'] == 'true':
+			surv.diarrhea=True
+			surv.test_results="Yes"
+			user.covid_status = "Positive"
+
+	user.last_update = datetime.datetime.now()		
+	user.save()
+	surv.save()
+
+	user_data = {
+		'covidstatus' : user.covid_status
 	}
 
 	return JsonResponse(user_data)
