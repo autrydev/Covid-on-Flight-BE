@@ -164,14 +164,16 @@ def admin_flight_search(request):
 def covidstatus(request):
 	json_data = json.loads(request.body)
 	id = json_data['id']
-	last = 'None'
+	
 
 	user = COFUser.objects.get(id=id)
 
 	tickets = FlightsTaken.objects.filter(email=user.id) #References user id instead of email. Use filter instead of get
 	flights = tickets.values("flight_id")
 	planes = Flight.objects.filter(pk__in=flights) #All flights user has been on
-	if planes is not None:
+	if not planes:
+		last = 'None'
+	else:
 		last = planes.order_by('date').last().date
 	
 	#cplanes = FlightsTaken.objects.filter(flight_id__in=planes)
