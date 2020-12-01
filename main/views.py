@@ -244,6 +244,21 @@ def account_settings(request):
 
 	user = COFUser.objects.get(id=id)
 
+	if "first_name" in json_data:
+		fname = json_data['first_name']
+		user.first_name = fname
+	if "last_name" in json_data:
+		lname = json_data['last_name']
+		user.last_name = lname
+	if "email" in json_data:
+		nemail = json_data['email']
+		user.email = nemail
+	if "phone_number" in json_data:
+		nphone = json_data['phone_number']
+		user.phone_number = nphone
+	
+	user.save()
+
 	user_data = {
 		'firstName' : user.first_name,
 		'lastName' : user.last_name,
