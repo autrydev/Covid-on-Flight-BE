@@ -9,6 +9,7 @@ urlpatterns = [
 	#path('admin_signup/', views.create_account, name='admin_signup'),
 	path('dashboard', views.user_dashboard, name='user_dashboard'),
 	path('accountsettings', views.account_settings, name='account_settings'),
+	path('admindashboard', views.admin_dashboard, name='admin_dashboard'),
 	path('adminflightsearch', views.admin_flight_search, name='admin_flight_search'),
     #path('', views.login, name='login'),
 ]

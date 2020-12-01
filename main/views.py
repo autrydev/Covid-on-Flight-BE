@@ -151,7 +151,43 @@ def user_dashboard(request):
 	
 
 def admin_dashboard(request):
-	return HttpResponse('Admin_Dashboard Vue ✈️')
+	# Get counts in all statuses
+	unknown = 0
+	negative = 0
+	positive = 0
+	
+	users = COFUser.objects.all()
+	for user in users:
+		if user.covid_status == 'Unknown':
+			unknown += 1
+		elif user.covid_status == 'Negative':
+			negative += 1
+		elif user.covid_status == 'Positive':
+			positive += 1
+
+	# Get all previous flights that had COVID-positive passengers (count > 0)
+	flights = Flight.objects.all()
+	positive_flights = []
+	for flight in flights:
+		if flight.date < date.today() and flight.covid_count > 0:
+			flight_json = {
+				"flight_id" : flight.flight_id,
+				"date" : flight.date,
+				"departure_city" : flight.departure_city,
+				"arrival_city" : flight.arrival_city,
+				"count" : flight.covid_count
+			}
+
+			positive_flights.append(flight_json)
+
+	output = {
+		'Unknown' : unknown,
+		'Negative' : negative,
+		'Positive' : positive,
+		'positive_flights' : positive_flights
+	}
+
+	return JsonResponse(output)
 
 def admin_flight_search(request):
 	json_data = json.loads(request.body)
