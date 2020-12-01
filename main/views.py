@@ -171,7 +171,8 @@ def covidstatus(request):
 	tickets = FlightsTaken.objects.filter(email=user.id) #References user id instead of email. Use filter instead of get
 	flights = tickets.values("flight_id")
 	planes = Flight.objects.filter(pk__in=flights) #All flights user has been on
-	last = planes.order_by('date').last().date
+	if planes is not None:
+		last = planes.order_by('date').last().date
 	
 	#cplanes = FlightsTaken.objects.filter(flight_id__in=planes)
 	#ctickets = cplanes.values("email")
