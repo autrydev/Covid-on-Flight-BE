@@ -170,10 +170,14 @@ def covidstatus(request):
 
 	tickets = FlightsTaken.objects.filter(email=user.id) #References user id instead of email. Use filter instead of get
 	flights = tickets.values("flight_id")
-	planes = Flight.objects.filter(pk__in=flights)
+	planes = Flight.objects.filter(pk__in=flights) #All flights user has been on
 	last = planes.order_by('date').last().date
 	
+	#cplanes = FlightsTaken.objects.filter(flight_id__in=planes)
+	#ctickets = cplanes.values("email")
+	#infected = COFUser.objects.filter(pk__in=ctickets)
 	#if user.covid_status == "Positive" or user.covid_status == "positive" :
+
 	#	# Sends SMS (Twilio)
 	#		try:
 	#			twilio_client.messages.create(
