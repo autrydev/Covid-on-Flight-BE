@@ -32,20 +32,48 @@ def login(request):
 		email = json_data['email'] #Reference the email key/value from the json_data variable
 		password = json_data['password']
 		user = authenticate(username=email, password=password)
-		if user is not None:
-			if (user.covid_status == 'Unknown' or user.last_update is None
-				or (user.last_update + timedelta(days=14)) < date.today()):
-					email = Mail(
-						from_email='CovidOnFlight@gmail.com',
-						to_emails=user.email,
-						subject='Please update your COVID status.',
-						html_content=('<h2><strong>Hello, ' + user.first_name + ' ' + user.last_name + '!'
-						'✈️</strong></h2><p>It\'s COVID on Flight speaking. We\'re here to ask you to '
-						'update your current COVID status to help inform and protect others! Thank you.</p>')
-					)
-					sendgrid_client.send(email)
+		
+		# Checks all users for needing to update status
+		all_users = COFUser.objects.all()
+		for check in all_users:
+			if check.covid_status != 'Notified' and (check.covid_status == 'Unknown'
+				or check.last_update is None or (check.last_update + timedelta(days=14)) < date.today()):
+					try:
+						email = Mail(
+							from_email='CovidOnFlight@gmail.com',
+							to_emails=check.email,
+							subject='Please update your COVID status.',
+							html_content=('<h2><strong>Hello, ' + check.first_name + ' ' + check.last_name + '!'
+							'✈️</strong></h2><p>It\'s COVID on Flight speaking. We\'re here to ask you to '
+							'update your current COVID status to help inform and protect others! Thank you.</p>')
+						)
+						sendgrid_client.send(email)
 
-			return HttpResponse(user.id, status=200)
+						# TODO: remove
+						if check.covid_status is None:
+							status = 'Blank'
+						else:
+							status = check.covid_status
+
+						print('Sent update email to:',check.first_name,check.last_name,'('+str(check.last_update)+' & '+status+')') # TODO: remove
+						check.covid_status = 'Notified'
+						check.save()
+					except Exception as e:
+						print(e)
+
+		# Checks if user is authenticated
+		if user is not None:
+			output = {
+				'id' : user.id,
+				'update_status' : False
+			}
+
+			# If this current user needs to be updated, inform front-end
+			if user.covid_status == 'Unknown' or user.last_update is None or user.last_update + timedelta(days=14) < date.today():
+				output['update_status'] = True
+
+
+			return JsonResponse(output)
 		else:
 			return HttpResponse('Invalid Email/Password', status=401)
 
