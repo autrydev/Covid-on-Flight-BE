@@ -11,7 +11,7 @@ from twilio.base.exceptions import TwilioRestException
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from django.http import JsonResponse
-from datetime import date
+from datetime import date, timedelta
 from time import gmtime, strftime
 
 twilio_client = Client('ACe4f586ddf64043984c3f813e1bf1232e', 'a12087fa31758795d95c38d240b87177') # Twilio
@@ -142,10 +142,16 @@ def user_dashboard(request):
 
 	user = COFUser.objects.get(id=id)
 
+	if user.covid_status == 'Unknown' or user.last_update is None or user.last_update + timedelta(days=14) < date.today():
+		update_status = True
+	else:
+		update_status = False
+
 	dash_data = {
 		'firstname': user.first_name,
 		'prev_flights': prev_flights_json,
-		'future_flights': future_flights_json
+		'future_flights': future_flights_json,
+		'update_status' : update_status
 	}
 
 	return JsonResponse(dash_data, safe=False)
