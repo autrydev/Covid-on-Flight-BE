@@ -65,12 +65,12 @@ def login(request):
 		if user is not None:
 			output = {
 				'id' : user.id,
-				'update_status' : False
+				'staff_status' : False
 			}
 
-			# If this current user needs to be updated, inform front-end
-			if user.covid_status == 'Unknown' or user.last_update is None or user.last_update + timedelta(days=14) < date.today():
-				output['update_status'] = True
+			# If this current user is a staff member, replace with True
+			if user.is_staff:
+				output['staff_status'] = True
 
 
 			return JsonResponse(output)
