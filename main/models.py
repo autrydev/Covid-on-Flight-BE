@@ -77,6 +77,7 @@ class Survey(models.Model):
     fever_chills = models.BooleanField()
     cough = models.BooleanField()
     breathing_issues = models.BooleanField()
+    fatigue = models.BooleanField()
     aches = models.BooleanField()
     headache = models.BooleanField()
     loss_taste_smell = models.BooleanField()

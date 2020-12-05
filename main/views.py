@@ -298,77 +298,77 @@ def updatecovidstatus(request):
 		surv = Survey()
 		surv.results="No"
 		user.covid_status = "Negative"
-		if json_data['fever_chills'] == 'true':
+		if json_data['fever_chills']:
 			surv.fever_chills=True
 			surv.results="Yes"
 			user.covid_status="Positive"
 		else:
 			surv.fever_chills=False
 
-		if json_data['cough'] == 'true':
+		if json_data['cough']:
 			surv.cough=True
 			surv.results="Yes"
 			user.covid_status="Positive"
 		else:
 			surv.cough=False
 
-		if json_data['breathing_issues'] == 'true':
+		if json_data['breathing_issues']:
 			surv.breathing_issues=True
 			surv.results="Yes"
 			user.covid_status="Positive"
 		else:
 			surv.breathing_issues=False
 			
-		if json_data['fatigue'] == 'true':
+		if json_data['fatigue']:
 			surv.fatigue=True
 			surv.results="Yes"
 			user.covid_status = "Positive"
 		else:
 			surv.fatigue=False
 			
-		if json_data['aches'] == 'true':
+		if json_data['aches']:
 			surv.aches=True
 			surv.results="Yes"
 			user.covid_status = "Positive"
 		else:
 			surv.aches=False
 			
-		if json_data['headache'] == 'true':
+		if json_data['headache']:
 			surv.headache=True
 			surv.results="Yes"
 			user.covid_status = "Positive"
 		else:
 			surv.headache=False
 			
-		if json_data['loss_taste_smell'] == 'true':
+		if json_data['loss_taste_smell']:
 			surv.loss_taste_smell=True
 			surv.results="Yes"
 			user.covid_status = "Positive"
 		else:
 			surv.loss_taste_smell=False
 			
-		if json_data['sore_throat'] == 'true':
+		if json_data['sore_throat']:
 			surv.sore_throat=True
 			surv.results="Yes"
 			user.covid_status = "Positive"
 		else:
 			surv.sore_throat=False
 
-		if json_data['congestion'] == 'true':
-				surv.congestion=True
-				surv.results="Yes"
-				user.covid_status = "Positive"	
+		if json_data['congestion']:
+			surv.congestion=True
+			surv.results="Yes"
+			user.covid_status = "Positive"	
 		else:
 			surv.congestion=False
 
-		if json_data['nausea'] == 'true':
+		if json_data['nausea']:
 			surv.nausea=True
 			surv.results="Yes"
 			user.covid_status = "Positive"
 		else:
 			surv.nausea=False
 
-		if json_data['diarrhea'] == 'true':
+		if json_data['diarrhea']:
 			surv.diarrhea=True
 			surv.results="Yes"
 			user.covid_status = "Positive"
@@ -382,6 +382,8 @@ def updatecovidstatus(request):
 		user_data = {
 			'covidstatus' : user.covid_status
 		}
+
+		print(user.first_name,user.covid_status)
 
 		return JsonResponse(user_data)
 
