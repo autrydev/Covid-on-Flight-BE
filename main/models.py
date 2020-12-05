@@ -73,8 +73,6 @@ class RecoveryCombination(models.Model):
 class Survey(models.Model):
     # IDs already automatically created by Django
     results = models.CharField(max_length=20, blank=True)
-    covid_test = models.BooleanField() # Yes, No
-    test_results = models.CharField(max_length=3, default='N/A') # Yes, No, N/A
     # The following are Yes/No's:
     fever_chills = models.BooleanField()
     cough = models.BooleanField()

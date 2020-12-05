@@ -160,8 +160,6 @@ class Command(BaseCommand):
             self.stdout.write('============Surveys============')
             alligator_survey = Survey.objects.create(
                 results = 'Incomplete',
-                covid_test = False,
-                test_results = 'N/A',
                 fever_chills = False,
                 cough = True,
                 breathing_issues = False,
@@ -179,8 +177,6 @@ class Command(BaseCommand):
 
             brady_survey = Survey.objects.create(
                 results = 'Negative',
-                covid_test = True,
-                test_results = 'N',
                 fever_chills = False,
                 cough = False,
                 breathing_issues = False,
@@ -197,8 +193,6 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS('added!'))
             brady_survey2 = Survey.objects.create(
                 results = 'Negative',
-                covid_test = True,
-                test_results = 'N',
                 fever_chills = False,
                 cough = False,
                 breathing_issues = False,
@@ -216,8 +210,6 @@ class Command(BaseCommand):
 
             bastian_survey = Survey.objects.create(
                 results = 'Negative',
-                covid_test = True,
-                test_results = 'N',
                 fever_chills = False,
                 cough = False,
                 breathing_issues = False,
@@ -235,8 +227,6 @@ class Command(BaseCommand):
 
             matthews_survey = Survey.objects.create(
                 results = 'Positive',
-                covid_test = False,
-                test_results = 'N/A',
                 fever_chills = True,
                 cough = True,
                 breathing_issues = True,

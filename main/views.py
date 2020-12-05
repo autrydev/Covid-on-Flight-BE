@@ -296,72 +296,96 @@ def updatecovidstatus(request):
 
 	if request.method == "POST":
 		surv = Survey()
-		surv.test_results='No'
-	if "covid_test" in json_data:
-		if json_data['covid_test'] == 'Yes':
-			surv.covid_test=True
-		else:
-			surv.covid_test=False
-	if "fever_chills" in json_data:
-		if json_data['fever_chills'] == 'True' or json_data['fever_chills'] == 'true':
+		surv.results="No"
+		user.covid_status = "Negative"
+		if json_data['fever_chills'] == 'true':
 			surv.fever_chills=True
-			surv.test_results="Yes"
-			user.covid_status = "Positive"	
-	if "cough" in json_data:
-		if json_data['cough'] == 'True' or json_data['cough'] == 'true':
+			surv.results="Yes"
+			user.covid_status="Positive"
+		else:
+			surv.fever_chills=False
+
+		if json_data['cough'] == 'true':
 			surv.cough=True
-			surv.test_results="Yes"
-			user.covid_status = "Positive"	
-	if "breathing_issues" in json_data:
-		if json_data['breathing_issues'] == 'True' or json_data['breathing_issues'] == 'true':
+			surv.results="Yes"
+			user.covid_status="Positive"
+		else:
+			surv.cough=False
+
+		if json_data['breathing_issues'] == 'true':
 			surv.breathing_issues=True
-			surv.test_results="Yes"
-			user.covid_status = "Positive"	
-	if "aches" in json_data:
-		if json_data['aches'] == 'True' or json_data['aches'] == 'true':
+			surv.results="Yes"
+			user.covid_status="Positive"
+		else:
+			surv.breathing_issues=False
+			
+		if json_data['fatigue'] == 'true':
+			surv.fatigue=True
+			surv.results="Yes"
+			user.covid_status = "Positive"
+		else:
+			surv.fatigue=False
+			
+		if json_data['aches'] == 'true':
 			surv.aches=True
-			surv.test_results="Yes"
-			user.covid_status = "Positive"	
-	if "headache" in json_data:
-		if json_data['headache'] == 'True' or json_data['headache'] == 'true':
+			surv.results="Yes"
+			user.covid_status = "Positive"
+		else:
+			surv.aches=False
+			
+		if json_data['headache'] == 'true':
 			surv.headache=True
-			surv.test_results="Yes"
-			user.covid_status = "Positive"	
-	if "loss_taste_smell" in json_data:
-		if json_data['loss_taste_smell'] == 'True' or json_data['loss_taste_smell'] == 'true':
+			surv.results="Yes"
+			user.covid_status = "Positive"
+		else:
+			surv.headache=False
+			
+		if json_data['loss_taste_smell'] == 'true':
 			surv.loss_taste_smell=True
-			surv.test_results="Yes"
-			user.covid_status = "Positive"	
-	if "sore_throat" in json_data:
-		if json_data['sore_throat'] == 'True' or json_data['sore_throat'] == 'true':
+			surv.results="Yes"
+			user.covid_status = "Positive"
+		else:
+			surv.loss_taste_smell=False
+			
+		if json_data['sore_throat'] == 'true':
 			surv.sore_throat=True
-			surv.test_results="Yes"
-			user.covid_status = "Positive"	
-	if "congestion" in json_data:
-		if json_data['congestion'] == 'True' or json_data['congestion'] == 'true':
-			surv.congestion=True
-			surv.test_results="Yes"
-			user.covid_status = "Positive"		
-	if "nausea" in json_data:
-		if json_data['nausea'] == 'True' or json_data['nausea'] == 'true':
+			surv.results="Yes"
+			user.covid_status = "Positive"
+		else:
+			surv.sore_throat=False
+
+		if json_data['congestion'] == 'true':
+				surv.congestion=True
+				surv.results="Yes"
+				user.covid_status = "Positive"	
+		else:
+			surv.congestion=False
+
+		if json_data['nausea'] == 'true':
 			surv.nausea=True
-			surv.test_results="Yes"
+			surv.results="Yes"
 			user.covid_status = "Positive"
-	if "diarrhea" in json_data:
-		if json_data['diarrhea'] == 'True' or json_data['diarrhea'] == 'true':
+		else:
+			surv.nausea=False
+
+		if json_data['diarrhea'] == 'true':
 			surv.diarrhea=True
-			surv.test_results="Yes"
+			surv.results="Yes"
 			user.covid_status = "Positive"
+		else:
+			surv.diarrhea=False
 
-	user.last_update = datetime.datetime.now()		
-	user.save()
-	surv.save()
+		user.last_update = date.today()		
+		user.save()
+		surv.save()
 
-	user_data = {
-		'covidstatus' : user.covid_status
-	}
+		user_data = {
+			'covidstatus' : user.covid_status
+		}
 
-	return JsonResponse(user_data)
+		return JsonResponse(user_data)
+
+	return HttpResponse('Cannot update')
 
 
 def account_settings(request):
