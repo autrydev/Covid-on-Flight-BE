@@ -93,8 +93,7 @@ class Flight(models.Model):
     departure_city = models.CharField(max_length=35)
     arrival_city = models.CharField(max_length=35)
     date = models.DateField()
-    departure_time = models.TimeField()
-    arrival_time = models.TimeField()
+    arrival_date = models.DateField()
     covid_count = models.PositiveIntegerField(default=0)
 
 
