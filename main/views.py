@@ -11,7 +11,7 @@ from twilio.base.exceptions import TwilioRestException
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from django.http import JsonResponse
-from datetime import date
+from datetime import date, timedelta
 from time import gmtime, strftime
 
 twilio_client = Client('ACe4f586ddf64043984c3f813e1bf1232e', 'a12087fa31758795d95c38d240b87177') # Twilio
@@ -253,33 +253,6 @@ def covidstatus(request):
 		last = 'None'
 	else:
 		last = planes.order_by('date').last().date
-	
-	#cplanes = FlightsTaken.objects.filter(flight_id__in=planes)
-	#ctickets = cplanes.values("email")
-	#infected = COFUser.objects.filter(pk__in=ctickets)
-	#if user.covid_status == "Positive" or user.covid_status == "positive" :
-
-	#	# Sends SMS (Twilio)
-	#		try:
-	#			twilio_client.messages.create(
-	#			body=('Thank you for signing up for Covid on Flight, ' + first_name + ' ' + last_name + '!'),
-	#			from_='+12185304600',
-	#			to=('+1'+user.phone_number)
-	#			)
-	#		except TwilioRestException:
-	#			print('Error texting user')
-	#
-			# Sends email (SendGrid)
-	#		try:
-	#			email = Mail(
-	#			from_email='CovidOnFlight@gmail.com',
-	#			to_emails=user.email,
-	#			subject='Welcome to Covid on Flight!',
-	#			html_content=('<h2><strong>Hi, ' + first_name + ' ' + last_name + '! ✈️</strong></h2><p>Welcome to Covid on Flight! We look forward to making your travels safer.</p>')
-	#			)
-	#			sendgrid_client.send(email)
-	#		except Exception as e:
-	#			print(e)
 		
 	user_data = {
 		'covidstatus' : user.covid_status,
@@ -383,7 +356,45 @@ def updatecovidstatus(request):
 			'covidstatus' : user.covid_status
 		}
 
-		print(user.first_name,user.covid_status)
+		# Notifies other passengers if necessary
+		if user.covid_status == 'Positive': # need to update other passengers
+			flights_taken = FlightsTaken.objects.filter(email=user)
+			for flight in flights_taken:
+				flight = flight.flight_id
+				if flight.date >= date.today() - timedelta(days=14) and flight.date <= date.today(): # if flight was within 14 days
+					other_users = FlightsTaken.objects.exclude(email=user).filter(flight_id=flight) # other users on same flight
+
+					for user in other_users: # emails users on same flight
+						user = user.email
+
+						# Sends SMS (Twilio)
+						try:
+							twilio_client.messages.create(
+							body=('Hello, ' + user.first_name + ' ' + user.last_name + '. Another passenger on your recent flight ' +
+									flight.flight_id + ' now has COVID-19. Please quarantine and take other precautions as necessary.'),
+							from_='+12185304600',
+							to=('+1'+user.phone_number)
+							)
+						except TwilioRestException:
+							print('Error texting user')
+						# Sends email (SendGrid)
+						try:
+							email = Mail(
+							from_email='CovidOnFlight@gmail.com',
+							to_emails=user.email,
+							subject='Welcome to Covid on Flight!',
+							html_content=('<h2><strong>Hello, ' + user.first_name + ' ' + user.last_name + '. ' + 
+								'</strong></h2><p>Someone on your recent flight ' + flight.flight_id + ' now has COVID-19. ' +
+								'Please quarantine and take other precautions as necessary.</p>' +
+								'<p>Thank you for protecting others,</p>' + 
+								'<p>Covid on Flight ✈️</p>'
+								)
+							)
+							sendgrid_client.send(email)
+						except Exception as e:
+							print(e)
+			
+
 
 		return JsonResponse(user_data)
 
