@@ -14,7 +14,7 @@ from django.http import JsonResponse
 import string
 import random
 from datetime import date, timedelta
-from time import gmtime, strftim
+from time import gmtime, strftime
 
 twilio_client = Client('ACe4f586ddf64043984c3f813e1bf1232e', 'a12087fa31758795d95c38d240b87177') # Twilio
 sendgrid_client = SendGridAPIClient('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') # SendGrid
