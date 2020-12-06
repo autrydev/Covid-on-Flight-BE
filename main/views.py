@@ -443,7 +443,7 @@ def register_flight(request):
 	departure_city= json_data['departure_city']
 	arrival_city= json_data['arrival_city']
 
-	#user_object = COFUser.objects.get(email=email)
+	user_object = COFUser.objects.get(email=email)
 	flight = Flight.objects.create(
 
 	flight_id=flight_id,
@@ -455,11 +455,12 @@ def register_flight(request):
 	)
 	flight.save()
 
-	survey = Survey.objects.all()
+	survey = Survey.objects.filter(results="positive").first()
+
 	Flight_taken=FlightsTaken.objects.create(
-		email=email,
+		email=user_object,
 		survey_id=survey,
-		flight_id=flight_id,
+		flight_id=flight,
 		row_seat=row,
 	)
 	Flight_taken.save()
