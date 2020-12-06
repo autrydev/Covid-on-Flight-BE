@@ -430,3 +430,27 @@ def account_settings(request):
 	}
 
 	return JsonResponse(user_data)
+
+
+def register_flight(request):
+
+	email= json_data['email']
+	reservation_number= json_data['reservation_number']
+	flight_id= json_data['flight_id']
+	from_date= json_data['from_date']
+	to_date= json_data['to_date']
+	departure_city= json_data['departure_city']
+	arrival_city= json_data['arrival_city']
+
+	user = COFUser.objects.get(email=email)
+
+
+
+	user_data = {
+		'firstName': user.first_name,
+		'lastName': user.last_name,
+		'email': user.email,
+		'phoneNumber': user.phone_number
+	}
+
+	return JsonResponse(status=200)

@@ -13,5 +13,6 @@ urlpatterns = [
 	path('accountsettings', views.account_settings, name='account_settings'),
 	path('admindashboard', views.admin_dashboard, name='admin_dashboard'),
 	path('adminflightsearch', views.admin_flight_search, name='admin_flight_search'),
+	path('registerflight', views.register_flight, name='register_flight')
     #path('', views.login, name='login'),
 ]
