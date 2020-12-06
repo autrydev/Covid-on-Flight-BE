@@ -434,7 +434,7 @@ def account_settings(request):
 
 def register_flight(request):
 	json_data = json.loads(request.body)
-	email = json_data['email']
+	id = json_data['id']
 	row = json_data['seat']
 	reservation_number= json_data['reservation_number']
 	flight_id= json_data['flight_id']
@@ -443,19 +443,21 @@ def register_flight(request):
 	departure_city= json_data['departure_city']
 	arrival_city= json_data['arrival_city']
 
-	user_object = COFUser.objects.get(email=email)
-	flight = Flight.objects.create(
+	user_object = COFUser.objects.get(id=id)
 
-	flight_id=flight_id,
-	departure_city = departure_city,
-	arrival_city= arrival_city,
-	date= from_date,
-	arrival_date= to_date,
-	covid_count = 0,
-	)
-	flight.save()
+	flight = Flight.objects.filter(flight_id=flight_id)
+	if not flight: # if the flight doesn't already exist
+		flight = Flight.objects.create(
+					flight_id=flight_id,
+					departure_city = departure_city,
+					arrival_city= arrival_city,
+					date= from_date,
+					arrival_date= to_date,
+					covid_count = 0,
+		)
+		flight.save()
 
-	survey = Survey.objects.filter(results="positive").first()
+	survey = Survey.objects.all().first()
 
 	Flight_taken=FlightsTaken.objects.create(
 		email=user_object,
@@ -464,11 +466,5 @@ def register_flight(request):
 		row_seat=row,
 	)
 	Flight_taken.save()
-	#flight = {
-	#	'arrival_city' : arrival_city,
-	#	'departure_date' : from_date,
-	#	'arrival_date' : models.TimeField(),
-	#	'covid_count' : 0,
-	#}
 
 	return HttpResponse(status=200)

@@ -96,8 +96,7 @@ class Command(BaseCommand):
                 departure_city = 'LAX',
                 arrival_city = 'JFK',
                 date = str(today_date - one_day_past),
-                departure_time = '15:00:00',
-                arrival_time = '18:45:00',
+                arrival_date = str(today_date - one_day_past),
                 covid_count = 1
             )
             lax_jfk.save()
@@ -110,8 +109,7 @@ class Command(BaseCommand):
                 departure_city = 'AVL',
                 arrival_city = 'PIE',
                 date = str(today_date + four_days_future),
-                departure_time = '20:00:00',
-                arrival_time = '21:30:00',
+                arrival_date = str(today_date + four_days_future),
                 covid_count = 0
             )
             avl_pie.save()
@@ -124,8 +122,7 @@ class Command(BaseCommand):
                 departure_city = 'PIE',
                 arrival_city = 'AVL',
                 date = str(today_date + seven_days_future),
-                departure_time = '12:00:00',
-                arrival_time = '13:30:00',
+                arrival_date = str(today_date + seven_days_future),
                 covid_count = 0
             )
             pie_avl.save()
@@ -138,8 +135,7 @@ class Command(BaseCommand):
                 departure_city = 'DTW',
                 arrival_city = 'PHX',
                 date = str(today_date - twelve_days_past),
-                departure_time = '17:00:00',
-                arrival_time = '20:00:00',
+                arrival_date = str(today_date - twelve_days_past),
                 covid_count = 2
             )
             dtw_phx.save()
