@@ -264,8 +264,6 @@ def admin_flight_search(request):
 			"departureCity" : flight.departure_city,
 			"arrivalCity" : flight.arrival_city,
 			"date" : flight.date,
-			"departureTime" : flight.departure_time,
-			"arrivalTime" : flight.arrival_time,
 			"covidCount" : flight.covid_count
 		}
 		flight_jsons.append(flight_json)
