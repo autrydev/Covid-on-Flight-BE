@@ -11,6 +11,8 @@ from twilio.base.exceptions import TwilioRestException
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from django.http import JsonResponse
+import string
+import random
 from datetime import date, timedelta
 from time import gmtime, strftime
 
@@ -28,24 +30,53 @@ def login(request):
 	if request.user.is_authenticated:
 		return redirect('user_dashboard')
 	
-	if request.method == "POST":
-	#Uses Django Authentication
-
-		#These don't work:
-		#email = request.POST['email']
-		#password = request.POST['password']
-		#email = request.POST.get('email')
-		#password = request.POST.get('password')
-
-
+	if request.method == 'POST':
 		json_data = json.loads(request.body) #Put all contents of Post data into json_data variable
 		email = json_data['email'] #Reference the email key/value from the json_data variable
 		password = json_data['password']
 		user = authenticate(username=email, password=password)
+		
+		# Checks all users for needing to update status
+		all_users = COFUser.objects.all()
+		for check in all_users:
+			if check.covid_status != 'Notified' and (check.covid_status == 'Unknown'
+				or check.last_update is None or (check.last_update + timedelta(days=14)) < date.today()):
+					try:
+						email = Mail(
+							from_email='CovidOnFlight@gmail.com',
+							to_emails=check.email,
+							subject='Please update your COVID status.',
+							html_content=('<h2><strong>Hello, ' + check.first_name + ' ' + check.last_name + '!'
+							'✈️</strong></h2><p>It\'s COVID on Flight speaking. We\'re here to ask you to '
+							'update your current COVID status to help inform and protect others! Thank you.</p>')
+						)
+						sendgrid_client.send(email)
+
+						# TODO: remove
+						if check.covid_status is None:
+							status = 'Blank'
+						else:
+							status = check.covid_status
+
+						print('Sent update email to:',check.first_name,check.last_name,'('+str(check.last_update)+' & '+status+')') # TODO: remove
+						check.covid_status = 'Notified'
+						check.save()
+					except Exception as e:
+						print(e)
+
+		# Checks if user is authenticated
 		if user is not None:
-			#django_login(request,user)
-			#return redirect('user_dashboard')
-			return HttpResponse(user.id, status=200)
+			output = {
+				'id' : user.id,
+				'staff_status' : False
+			}
+
+			# If this current user is a staff member, replace with True
+			if user.is_staff:
+				output['staff_status'] = True
+
+
+			return JsonResponse(output)
 		else:
 			return HttpResponse('Invalid Email/Password', status=401)
 
@@ -259,33 +290,6 @@ def covidstatus(request):
 		last = 'None'
 	else:
 		last = planes.order_by('date').last().date
-	
-	#cplanes = FlightsTaken.objects.filter(flight_id__in=planes)
-	#ctickets = cplanes.values("email")
-	#infected = COFUser.objects.filter(pk__in=ctickets)
-	#if user.covid_status == "Positive" or user.covid_status == "positive" :
-
-	#	# Sends SMS (Twilio)
-	#		try:
-	#			twilio_client.messages.create(
-	#			body=('Thank you for signing up for Covid on Flight, ' + first_name + ' ' + last_name + '!'),
-	#			from_='+12185304600',
-	#			to=('+1'+user.phone_number)
-	#			)
-	#		except TwilioRestException:
-	#			print('Error texting user')
-	#
-			# Sends email (SendGrid)
-	#		try:
-	#			email = Mail(
-	#			from_email='CovidOnFlight@gmail.com',
-	#			to_emails=user.email,
-	#			subject='Welcome to Covid on Flight!',
-	#			html_content=('<h2><strong>Hi, ' + first_name + ' ' + last_name + '! ✈️</strong></h2><p>Welcome to Covid on Flight! We look forward to making your travels safer.</p>')
-	#			)
-	#			sendgrid_client.send(email)
-	#		except Exception as e:
-	#			print(e)
 		
 	user_data = {
 		'covidstatus' : user.covid_status,
@@ -302,72 +306,136 @@ def updatecovidstatus(request):
 
 	if request.method == "POST":
 		surv = Survey()
-		surv.test_results='No'
-	if "covid_test" in json_data:
-		if json_data['covid_test'] == 'Yes':
-			surv.covid_test=True
-		else:
-			surv.covid_test=False
-	if "fever_chills" in json_data:
-		if json_data['fever_chills'] == 'True' or json_data['fever_chills'] == 'true':
+		surv.results="No"
+		user.covid_status = "Negative"
+		if json_data['fever_chills']:
 			surv.fever_chills=True
-			surv.test_results="Yes"
-			user.covid_status = "Positive"	
-	if "cough" in json_data:
-		if json_data['cough'] == 'True' or json_data['cough'] == 'true':
+			surv.results="Yes"
+			user.covid_status="Positive"
+		else:
+			surv.fever_chills=False
+
+		if json_data['cough']:
 			surv.cough=True
-			surv.test_results="Yes"
-			user.covid_status = "Positive"	
-	if "breathing_issues" in json_data:
-		if json_data['breathing_issues'] == 'True' or json_data['breathing_issues'] == 'true':
+			surv.results="Yes"
+			user.covid_status="Positive"
+		else:
+			surv.cough=False
+
+		if json_data['breathing_issues']:
 			surv.breathing_issues=True
-			surv.test_results="Yes"
-			user.covid_status = "Positive"	
-	if "aches" in json_data:
-		if json_data['aches'] == 'True' or json_data['aches'] == 'true':
+			surv.results="Yes"
+			user.covid_status="Positive"
+		else:
+			surv.breathing_issues=False
+			
+		if json_data['fatigue']:
+			surv.fatigue=True
+			surv.results="Yes"
+			user.covid_status = "Positive"
+		else:
+			surv.fatigue=False
+			
+		if json_data['aches']:
 			surv.aches=True
-			surv.test_results="Yes"
-			user.covid_status = "Positive"	
-	if "headache" in json_data:
-		if json_data['headache'] == 'True' or json_data['headache'] == 'true':
+			surv.results="Yes"
+			user.covid_status = "Positive"
+		else:
+			surv.aches=False
+			
+		if json_data['headache']:
 			surv.headache=True
-			surv.test_results="Yes"
-			user.covid_status = "Positive"	
-	if "loss_taste_smell" in json_data:
-		if json_data['loss_taste_smell'] == 'True' or json_data['loss_taste_smell'] == 'true':
+			surv.results="Yes"
+			user.covid_status = "Positive"
+		else:
+			surv.headache=False
+			
+		if json_data['loss_taste_smell']:
 			surv.loss_taste_smell=True
-			surv.test_results="Yes"
-			user.covid_status = "Positive"	
-	if "sore_throat" in json_data:
-		if json_data['sore_throat'] == 'True' or json_data['sore_throat'] == 'true':
+			surv.results="Yes"
+			user.covid_status = "Positive"
+		else:
+			surv.loss_taste_smell=False
+			
+		if json_data['sore_throat']:
 			surv.sore_throat=True
-			surv.test_results="Yes"
-			user.covid_status = "Positive"	
-	if "congestion" in json_data:
-		if json_data['congestion'] == 'True' or json_data['congestion'] == 'true':
+			surv.results="Yes"
+			user.covid_status = "Positive"
+		else:
+			surv.sore_throat=False
+
+		if json_data['congestion']:
 			surv.congestion=True
-			surv.test_results="Yes"
-			user.covid_status = "Positive"		
-	if "nausea" in json_data:
-		if json_data['nausea'] == 'True' or json_data['nausea'] == 'true':
+			surv.results="Yes"
+			user.covid_status = "Positive"	
+		else:
+			surv.congestion=False
+
+		if json_data['nausea']:
 			surv.nausea=True
-			surv.test_results="Yes"
+			surv.results="Yes"
 			user.covid_status = "Positive"
-	if "diarrhea" in json_data:
-		if json_data['diarrhea'] == 'True' or json_data['diarrhea'] == 'true':
+		else:
+			surv.nausea=False
+
+		if json_data['diarrhea']:
 			surv.diarrhea=True
-			surv.test_results="Yes"
+			surv.results="Yes"
 			user.covid_status = "Positive"
+		else:
+			surv.diarrhea=False
 
-	user.last_update = datetime.datetime.now()		
-	user.save()
-	surv.save()
+		user.last_update = date.today()		
+		user.save()
+		surv.save()
 
-	user_data = {
-		'covidstatus' : user.covid_status
-	}
+		user_data = {
+			'covidstatus' : user.covid_status
+		}
 
-	return JsonResponse(user_data)
+		# Notifies other passengers if necessary
+		if user.covid_status == 'Positive': # need to update other passengers
+			flights_taken = FlightsTaken.objects.filter(email=user)
+			for flight in flights_taken:
+				flight = flight.flight_id
+				if flight.date >= date.today() - timedelta(days=14) and flight.date <= date.today(): # if flight was within 14 days
+					other_users = FlightsTaken.objects.exclude(email=user).filter(flight_id=flight) # other users on same flight
+
+					for user in other_users: # emails users on same flight
+						user = user.email
+
+						# Sends SMS (Twilio)
+						try:
+							twilio_client.messages.create(
+							body=('Hello, ' + user.first_name + ' ' + user.last_name + '. Another passenger on your recent flight ' +
+									flight.flight_id + ' now has COVID-19. Please quarantine and take other precautions as necessary.'),
+							from_='+12185304600',
+							to=('+1'+user.phone_number)
+							)
+						except TwilioRestException:
+							print('Error texting user')
+						# Sends email (SendGrid)
+						try:
+							email = Mail(
+							from_email='CovidOnFlight@gmail.com',
+							to_emails=user.email,
+							subject='Welcome to Covid on Flight!',
+							html_content=('<h2><strong>Hello, ' + user.first_name + ' ' + user.last_name + '. ' + 
+								'</strong></h2><p>Someone on your recent flight ' + flight.flight_id + ' now has COVID-19. ' +
+								'Please quarantine and take other precautions as necessary.</p>' +
+								'<p>Thank you for protecting others,</p>' + 
+								'<p>Covid on Flight ✈️</p>'
+								)
+							)
+							sendgrid_client.send(email)
+						except Exception as e:
+							print(e)
+			
+
+
+		return JsonResponse(user_data)
+
+	return HttpResponse('Cannot update')
 
 
 def account_settings(request):
@@ -399,3 +467,106 @@ def account_settings(request):
 	}
 
 	return JsonResponse(user_data)
+
+def register_flight(request):
+	json_data = json.loads(request.body)
+	id = json_data['id']
+	row = json_data['seat']
+	reservation_number= json_data['reservation_number']
+	flight_id= json_data['flight_id']
+	from_date= json_data['from_date']
+	to_date= json_data['to_date']
+	departure_city= json_data['departure_city']
+	arrival_city= json_data['arrival_city']
+
+	user_object = COFUser.objects.get(id=id)
+
+	flight = Flight.objects.filter(flight_id=flight_id)
+	if not flight: # if the flight doesn't already exist
+		flight = Flight.objects.create(
+					flight_id=flight_id,
+					departure_city = departure_city,
+					arrival_city= arrival_city,
+					date= from_date,
+					arrival_date= to_date,
+					covid_count = 0,
+		)
+		flight.save()
+
+	survey = Survey.objects.all().first()
+
+	Flight_taken=FlightsTaken.objects.create(
+		email=user_object,
+		survey_id=survey,
+		flight_id=flight,
+		row_seat=row,
+	)
+	Flight_taken.save()
+
+	return HttpResponse(status=200)
+
+	
+def send_code(request):
+	if request.method == "POST":
+		json_data = json.loads(request.body)
+		email = json_data['email']
+		
+		user = COFUser.objects.get(email=email)
+		if user:
+			# Sends email (SendGrid)
+			recovery_code = random.choices(string.ascii_letters, k=6)
+			recovery_code = "".join(recovery_code)
+			rc = RecoveryCombination.objects.create(email=user, recovery_code=recovery_code)
+			rc.save()
+			try:
+				email = Mail(
+					from_email='CovidOnFlight@gmail.com',
+					to_emails=email,
+					subject='Reset Password',
+					html_content=(
+								'<h2><strong>Hi, ' + user.first_name + ' ' + user.last_name + '! ✈️</strong></h2><p>It appears that you have forgotten your password. Please use this code to reset your password: </p>' + recovery_code)
+				)
+				sendgrid_client.send(email)
+			except Exception as e:
+				print(e)
+
+			return HttpResponse(recovery_code, status=200)
+
+		else:
+			return HttpResponse("User does not exist :(", status=401)
+
+
+def check_code(request):
+	if request.method == "POST":
+		json_data = json.loads(request.body)
+		verification_code=json_data['code']
+		email = json_data['email']
+
+		#RecoveryCombination requires an actual user to retrieve the email. As Such a variable must be created that
+		#stores the user. That user can then be used for RecoveryCombination.
+		user_object = COFUser.objects.get(email=email)
+		user = RecoveryCombination.objects.get(email=user_object)#This pulls the email 'key' from the COFUser object
+		if user:
+			if verification_code == user.recovery_code:
+				RecoveryCombination.objects.filter(email=user_object).delete()
+				return HttpResponse(verification_code, status=200)
+
+		else:
+			return HttpResponse("User does not exist :(", status=401)
+def reset_password(request):
+	if request.method == "POST":
+		json_data = json.loads(request.body)
+		password=json_data['password']
+		email = json_data['email']
+
+
+		user = COFUser.objects.get(email=email)
+
+		if user:
+			user.set_password(password)
+			user.save()
+			return HttpResponse("Password Changed", status=200)
+
+		else:
+			return HttpResponse("An error has occured", status=401)
+
