@@ -470,7 +470,6 @@ def register_flight(request):
 	json_data = json.loads(request.body)
 	id = json_data['id']
 	row = json_data['seat']
-	reservation_number= json_data['reservation_number']
 	flight_id= json_data['flight_id']
 	from_date= json_data['from_date']
 	to_date= json_data['to_date']
