@@ -90,14 +90,13 @@ class Command(BaseCommand):
             self.stdout.write('============Flights============')
             today_date = datetime.datetime.now().date()
 
-            one_day_past = datetime.timedelta(days=0)
+            one_day_past = datetime.timedelta(days=1)
             lax_jfk = Flight.objects.create(
                 flight_id = 'DL1742',
                 departure_city = 'LAX',
                 arrival_city = 'JFK',
                 date = str(today_date - one_day_past),
-                departure_time = '15:00:00',
-                arrival_time = '18:45:00',
+                arrival_date = str(today_date - one_day_past),
                 covid_count = 1
             )
             lax_jfk.save()
@@ -110,8 +109,7 @@ class Command(BaseCommand):
                 departure_city = 'AVL',
                 arrival_city = 'PIE',
                 date = str(today_date + four_days_future),
-                departure_time = '20:00:00',
-                arrival_time = '21:30:00',
+                arrival_date = str(today_date + four_days_future),
                 covid_count = 0
             )
             avl_pie.save()
@@ -124,8 +122,7 @@ class Command(BaseCommand):
                 departure_city = 'PIE',
                 arrival_city = 'AVL',
                 date = str(today_date + seven_days_future),
-                departure_time = '12:00:00',
-                arrival_time = '13:30:00',
+                arrival_date = str(today_date + seven_days_future),
                 covid_count = 0
             )
             pie_avl.save()
@@ -138,8 +135,7 @@ class Command(BaseCommand):
                 departure_city = 'DTW',
                 arrival_city = 'PHX',
                 date = str(today_date - twelve_days_past),
-                departure_time = '17:00:00',
-                arrival_time = '20:00:00',
+                arrival_date = str(today_date - twelve_days_past),
                 covid_count = 2
             )
             dtw_phx.save()
@@ -160,11 +156,10 @@ class Command(BaseCommand):
             self.stdout.write('============Surveys============')
             alligator_survey = Survey.objects.create(
                 results = 'Incomplete',
-                covid_test = False,
-                test_results = 'N/A',
                 fever_chills = False,
                 cough = True,
                 breathing_issues = False,
+                fatigue = False,
                 aches = False,
                 headache = False,
                 loss_taste_smell = False,
@@ -179,11 +174,10 @@ class Command(BaseCommand):
 
             brady_survey = Survey.objects.create(
                 results = 'Negative',
-                covid_test = True,
-                test_results = 'N',
                 fever_chills = False,
                 cough = False,
                 breathing_issues = False,
+                fatigue = False,
                 aches = False,
                 headache = False,
                 loss_taste_smell = False,
@@ -197,11 +191,10 @@ class Command(BaseCommand):
             self.stdout.write(self.style.SUCCESS('added!'))
             brady_survey2 = Survey.objects.create(
                 results = 'Negative',
-                covid_test = True,
-                test_results = 'N',
                 fever_chills = False,
                 cough = False,
                 breathing_issues = False,
+                fatigue = False,
                 aches = False,
                 headache = False,
                 loss_taste_smell = False,
@@ -216,11 +209,10 @@ class Command(BaseCommand):
 
             bastian_survey = Survey.objects.create(
                 results = 'Negative',
-                covid_test = True,
-                test_results = 'N',
                 fever_chills = False,
                 cough = False,
                 breathing_issues = False,
+                fatigue = False,
                 aches = False,
                 headache = False,
                 loss_taste_smell = False,
@@ -235,11 +227,10 @@ class Command(BaseCommand):
 
             matthews_survey = Survey.objects.create(
                 results = 'Positive',
-                covid_test = False,
-                test_results = 'N/A',
                 fever_chills = True,
                 cough = True,
                 breathing_issues = True,
+                fatigue = False,
                 aches = False,
                 headache = False,
                 loss_taste_smell = False,
