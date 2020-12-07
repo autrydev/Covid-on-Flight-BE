@@ -432,6 +432,44 @@ def account_settings(request):
 	}
 
 	return JsonResponse(user_data)
+
+def register_flight(request):
+	json_data = json.loads(request.body)
+	id = json_data['id']
+	row = json_data['seat']
+	reservation_number= json_data['reservation_number']
+	flight_id= json_data['flight_id']
+	from_date= json_data['from_date']
+	to_date= json_data['to_date']
+	departure_city= json_data['departure_city']
+	arrival_city= json_data['arrival_city']
+
+	user_object = COFUser.objects.get(id=id)
+
+	flight = Flight.objects.filter(flight_id=flight_id)
+	if not flight: # if the flight doesn't already exist
+		flight = Flight.objects.create(
+					flight_id=flight_id,
+					departure_city = departure_city,
+					arrival_city= arrival_city,
+					date= from_date,
+					arrival_date= to_date,
+					covid_count = 0,
+		)
+		flight.save()
+
+	survey = Survey.objects.all().first()
+
+	Flight_taken=FlightsTaken.objects.create(
+		email=user_object,
+		survey_id=survey,
+		flight_id=flight,
+		row_seat=row,
+	)
+	Flight_taken.save()
+
+	return HttpResponse(status=200)
+
 	
 def send_code(request):
 	if request.method == "POST":
@@ -496,7 +534,4 @@ def reset_password(request):
 
 		else:
 			return HttpResponse("An error has occured", status=401)
-
-
-
 
