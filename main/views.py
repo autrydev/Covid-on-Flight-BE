@@ -173,10 +173,16 @@ def user_dashboard(request):
 
 	user = COFUser.objects.get(id=id)
 
+	if user.covid_status == 'Unknown' or user.last_update is None or user.last_update + timedelta(days=14) < date.today():
+		update_status = True
+	else:
+		update_status = False
+
 	dash_data = {
 		'firstname': user.first_name,
 		'prev_flights': prev_flights_json,
-		'future_flights': future_flights_json
+		'future_flights': future_flights_json,
+		'update_status' : update_status
 	}
 
 	return JsonResponse(dash_data, safe=False)
