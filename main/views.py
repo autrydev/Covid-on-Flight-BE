@@ -11,6 +11,8 @@ from twilio.base.exceptions import TwilioRestException
 from sendgrid import SendGridAPIClient
 from sendgrid.helpers.mail import Mail
 from django.http import JsonResponse
+import string
+import random
 from datetime import date, timedelta
 from time import gmtime, strftime
 
@@ -431,7 +433,6 @@ def account_settings(request):
 
 	return JsonResponse(user_data)
 
-
 def register_flight(request):
 	json_data = json.loads(request.body)
 	id = json_data['id']
@@ -468,3 +469,69 @@ def register_flight(request):
 	Flight_taken.save()
 
 	return HttpResponse(status=200)
+
+	
+def send_code(request):
+	if request.method == "POST":
+		json_data = json.loads(request.body)
+		email = json_data['email']
+		
+		user = COFUser.objects.get(email=email)
+		if user:
+			# Sends email (SendGrid)
+			recovery_code = random.choices(string.ascii_letters, k=6)
+			recovery_code = "".join(recovery_code)
+			rc = RecoveryCombination.objects.create(email=user, recovery_code=recovery_code)
+			rc.save()
+			try:
+				email = Mail(
+					from_email='CovidOnFlight@gmail.com',
+					to_emails=email,
+					subject='Reset Password',
+					html_content=(
+								'<h2><strong>Hi, ' + user.first_name + ' ' + user.last_name + '! ✈️</strong></h2><p>It appears that you have forgotten your password. Please use this code to reset your password: </p>' + recovery_code)
+				)
+				sendgrid_client.send(email)
+			except Exception as e:
+				print(e)
+
+			return HttpResponse(recovery_code, status=200)
+
+		else:
+			return HttpResponse("User does not exist :(", status=401)
+
+
+def check_code(request):
+	if request.method == "POST":
+		json_data = json.loads(request.body)
+		verification_code=json_data['code']
+		email = json_data['email']
+
+		#RecoveryCombination requires an actual user to retrieve the email. As Such a variable must be created that
+		#stores the user. That user can then be used for RecoveryCombination.
+		user_object = COFUser.objects.get(email=email)
+		user = RecoveryCombination.objects.get(email=user_object)#This pulls the email 'key' from the COFUser object
+		if user:
+			if verification_code == user.recovery_code:
+				RecoveryCombination.objects.filter(email=user_object).delete()
+				return HttpResponse(verification_code, status=200)
+
+		else:
+			return HttpResponse("User does not exist :(", status=401)
+def reset_password(request):
+	if request.method == "POST":
+		json_data = json.loads(request.body)
+		password=json_data['password']
+		email = json_data['email']
+
+
+		user = COFUser.objects.get(email=email)
+
+		if user:
+			user.set_password(password)
+			user.save()
+			return HttpResponse("Password Changed", status=200)
+
+		else:
+			return HttpResponse("An error has occured", status=401)
+
