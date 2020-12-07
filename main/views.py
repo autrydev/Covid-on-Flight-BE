@@ -196,7 +196,7 @@ def admin_dashboard(request):
 	
 	users = COFUser.objects.all()
 	for user in users:
-		if user.covid_status == 'Unknown':
+		if user.covid_status == 'Unknown' or user.covid_status == 'Notified':
 			unknown += 1
 		elif user.covid_status == 'Negative':
 			negative += 1
