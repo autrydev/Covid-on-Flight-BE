@@ -15,5 +15,4 @@ rm db.sqlite3
 ls
 echo "------------"
 cd ..
-python manage.py makemigrations
-python manage.py migrate
+python manage.py populate
