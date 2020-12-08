@@ -15,4 +15,4 @@ rm db.sqlite3
 ls
 echo "------------"
 cd ..
-python manage.py populate
+python manage.py testdata
