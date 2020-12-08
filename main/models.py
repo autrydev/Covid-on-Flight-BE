@@ -72,13 +72,12 @@ class RecoveryCombination(models.Model):
 # Defines the Survey object model
 class Survey(models.Model):
     # IDs already automatically created by Django
-    results = models.CharField(max_length=8, blank=True)
-    covid_test = models.BooleanField() # Yes, No
-    test_results = models.CharField(max_length=3, default='N/A') # Yes, No, N/A
+    results = models.CharField(max_length=20, blank=True)
     # The following are Yes/No's:
     fever_chills = models.BooleanField()
     cough = models.BooleanField()
     breathing_issues = models.BooleanField()
+    fatigue = models.BooleanField()
     aches = models.BooleanField()
     headache = models.BooleanField()
     loss_taste_smell = models.BooleanField()
@@ -94,8 +93,7 @@ class Flight(models.Model):
     departure_city = models.CharField(max_length=35)
     arrival_city = models.CharField(max_length=35)
     date = models.DateField()
-    departure_time = models.TimeField()
-    arrival_time = models.TimeField()
+    arrival_date = models.DateField()
     covid_count = models.PositiveIntegerField(default=0)
 
 
