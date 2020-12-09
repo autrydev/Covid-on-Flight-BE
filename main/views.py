@@ -478,7 +478,7 @@ def register_flight(request):
 
 	user_object = COFUser.objects.get(id=id)
 
-	flight = Flight.objects.filter(flight_id=flight_id)
+	flight = Flight.objects.get(flight_id=flight_id)
 	if not flight: # if the flight doesn't already exist
 		flight = Flight.objects.create(
 					flight_id=flight_id,
