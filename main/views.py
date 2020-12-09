@@ -477,8 +477,9 @@ def register_flight(request):
 	arrival_city= json_data['arrival_city']
 
 	user_object = COFUser.objects.get(id=id)
+	flight = Flight.objects.filter(flight_id=flight_id)
 
-	flight = Flight.objects.get(flight_id=flight_id)
+
 	if not flight: # if the flight doesn't already exist
 		flight = Flight.objects.create(
 					flight_id=flight_id,
@@ -489,7 +490,7 @@ def register_flight(request):
 					covid_count = 0,
 		)
 		flight.save()
-
+	flight = Flight.objects.get(flight_id=flight_id)
 	survey = Survey.objects.all().first()
 
 	Flight_taken=FlightsTaken.objects.create(
